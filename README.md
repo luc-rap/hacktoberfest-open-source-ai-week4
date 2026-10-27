@@ -8,7 +8,7 @@ Build something spooky, or something that honors the past in the spirit of Día 
 Because I love the spooky season, DnD (and reading crazy thrillers 😅), I decided to built a short DnD-style game. I call it _The House That Remembers_, inspired by The Fall of the House of Usher written by Edgar Allan Poe in 1839. There are very big spoilers in the /story folder. If you want to enjoy the game, I recommend not checking the story files. 
 
 Tech stack:
-- Streamplit - app.py: UI, chat interface
+- Streamlit - app.py: UI, chat interface
 - Python - for logic, validates actions, updated history, clues, inventory
 - Ollama + Gemma - narrates the permitted outcome
 
