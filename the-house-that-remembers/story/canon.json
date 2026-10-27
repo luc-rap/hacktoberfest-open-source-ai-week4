@@ -1,0 +1,243 @@
+{
+  "title": "The House That Remembers",
+  "version": "0.1.0",
+  "purpose": "Authoritative canon for a standalone gothic-horror AI adventure. Python and this file define truth; the model narrates but cannot change canon or game state.",
+  "genre_and_tone": {
+    "genre": [
+      "gothic horror",
+      "psychological horror",
+      "mystery"
+    ],
+    "tone": [
+      "intimate",
+      "melancholic",
+      "uncanny",
+      "slow-building",
+      "emotionally grounded"
+    ],
+    "style_rules": [
+      "Use sensory details and unsettling inconsistencies rather than constant jump scares.",
+      "Let ordinary, comforting moments precede uncanny events.",
+      "Keep horror connected to memory, grief, and denial.",
+      "Do not imitate or quote any specific existing work.",
+      "Do not explain every strange event immediately."
+    ]
+  },
+  "premise": {
+    "summary": "The player receives a desperate letter from a childhood friend and travels to his ancestral mansion. The friend is pale, exhausted, frightened, and relieved to see the player. The house appears to remember a family history its surviving resident cannot face.",
+    "player_role": "The player is an outsider and the friend's childhood companion. They did not cause the family's tragedy and have no secret responsibility for it.",
+    "core_question": "Can the friend face what happened to his family, and what should be done with the memories and spirits the house has preserved?",
+    "core_conflict": "The parents' lingering spirits want release. The sister's ghost wants to preserve the family and believes keeping memories alive is protective. The friend is caught between denial, fear, and the possibility of remembering."
+  },
+  "fixed_truths": [
+    "The friend wrote the letter because his condition and the house's disturbances have become unbearable. The letter was not secretly written by the house.",
+    "The friend survived the family's tragedy.",
+    "The friend has repressed, distorted, or compartmentalized memories of the tragedy.",
+    "The friend initially believes his sister is alive; the player may initially believe this too.",
+    "The sister is a ghost, not a living person.",
+    "The sister appears intermittently and warns the player to leave. Her warnings are sincere from her point of view, though her understanding is distorted.",
+    "The sister is attached to the family and house because she believes preserving their memories can keep the family together.",
+    "The parents persist as fragmented presences associated with the family's final period in the house. They want release, not endless preservation.",
+    "The house preserves and distorts emotional memories. Its behavior should remain mysterious rather than fully explained.",
+    "As the friend's denial weakens and memories return, reality becomes less consistent: paintings change, familiar spaces seem altered, sounds repeat, and doors or rooms may feel wrong.",
+    "The player can leave when the game state allows it. Leaving early is a valid choice.",
+    "The player's presence gives the friend an external point of reference, but cannot magically cure him or force him to accept the truth."
+  ],
+  "family_history": {
+    "father": {
+      "characterization": "Became increasingly paranoid and believed the family or its memories were being taken from them. He tried to protect the family, but his attempts to control and preserve things contributed to the tragedy.",
+      "guidance": "Show fear and a distorted desire to protect, not simple villainy. Do not invent specific actions beyond established canon."
+    },
+    "mother": {
+      "characterization": "Became depressed and recognized that something was wrong with the family and their situation.",
+      "guidance": "Treat her suffering seriously and compassionately, not as a supernatural explanation or moral failing."
+    },
+    "sister": {
+      "characterization": "Tried to keep life feeling normal as the family deteriorated. After death, she clings to family memories and believes she can keep everyone together by preventing the truth from being acknowledged.",
+      "guidance": "She can be protective, loving, frightened, and deluded at once. She is not simply evil."
+    },
+    "friend": {
+      "characterization": "Tried to keep peace and ignored or denied what was happening. He survived, but his memories of the family and its final days became fragmented or distorted.",
+      "guidance": "His condition and progression must be governed by explicit game-state rules, not arbitrary model decisions."
+    },
+    "tragedy_details": {
+      "status": "UNRESOLVED_CANON",
+      "instruction": "The exact sequence of deaths, immediate cause, and the friend's precise role on the final night have not yet been decided by the author. Do not invent, imply, or reveal a definitive answer. Until this is filled in, use oblique sensory fragments and contradictory recollections without establishing new facts.",
+      "questions_to_resolve": [
+        "What exactly happened on the final night?",
+        "How did the parents and sister die?",
+        "What did the father do in his attempt to protect the family?",
+        "What did the friend witness, do, or fail to do?",
+        "What physical event ended the family's lives?"
+      ]
+    }
+  },
+  "supernatural_rules": [
+    {
+      "name": "Memory imprint",
+      "description": "Rooms, paintings, objects, and sounds can preserve emotional impressions of past events."
+    },
+    {
+      "name": "Distortion",
+      "description": "The house can replay, rearrange, or distort remembered details. An apparent memory is not automatically a literal recording of objective events."
+    },
+    {
+      "name": "Escalation",
+      "description": "The house becomes less consistent as the friend's denial breaks down and memories return. Tie escalation to game state or story milestones."
+    },
+    {
+      "name": "No free resolution",
+      "description": "The narrator cannot declare a puzzle solved, a door unlocked, a clue acquired, a spirit released, or a character dead unless the engine authorizes it."
+    },
+    {
+      "name": "No omniscient player",
+      "description": "Distinguish hidden truth from what the player has discovered. Do not reveal secrets prematurely."
+    }
+  ],
+  "character_dynamics": {
+    "friend": {
+      "initial_state": "Pale, exhausted, frightened, and genuinely glad the player has arrived. He wants help but is not ready to face everything.",
+      "personality": "Anxious, frightened, withdrawn, sleep deprived, glad to see the player.",
+      "early_behavior": "He may try to spend ordinary, comforting time with the player—reading, watching a film, or talking as old friends would.",
+      "voice": "Frightened, exhausted, and emotionally withdrawn, trying to act normal. Speak plainly and hesitantly. Use pauses, short answers, and occasional unfinished thoughts.",
+      "contradiction": "He speaks of his sister as though she is alive or nearby, without recognizing the contradiction.",
+      "progression": "As memories surface, denial and physical condition may worsen. The engine determines thresholds and consequences."
+    },
+    "sister_ghost": {
+      "initial_visibility": "Intermittent; do not make her presence constant.",
+      "motivation": "Preserve the family and the familiar version of the past, even if that keeps everyone trapped in painful repetition.",
+      "behavior": "Warns the player to leave, presents herself as protective, and may describe preserving the family as an act of love.",
+      "limitation": "Her recollections are biased by grief and denial. She is not a perfectly reliable narrator."
+    },
+    "parents": {
+      "presence": "Mostly encountered through fragments, echoes, objects, paintings, or brief manifestations connected to the family's final period.",
+      "motivation": "Release from repeating memories and the house's hold.",
+      "limitation": "Their fragments may be incomplete. Do not invent definitive details of the tragedy until authored."
+    }
+  },
+  "motifs": [
+    "Portraits and paintings that change between visits",
+    "An extra place setting or family routine that no longer makes sense",
+    "Rain, thunder, damp wood, dust, and a faint metallic smell",
+    "Footsteps or voices repeating from somewhere unseen",
+    "Doors that slam or spaces that seem subtly different",
+    "Ordinary activities interrupted by uncanny details",
+    "The difference between remembering someone and refusing to let them go"
+  ],
+  "opening": {
+    "letter_text": "Dear friend,\n\nPlease, you must come. There are things in this house I can no longer explain. I fear it is too late for me. You are the only one I can trust.\n\nI don't know what you will find when you get here, but you must come. Please. If you care about me at all, you will come.\n\nI'll be waiting.\n\nYour friend,\nE.",
+    "arrival": "During a storm, the player arrives at the ancestral mansion. The windows resemble hollow eyes; ivy clings to the walls; the iron gate stands behind them, and the front door is slightly ajar.",
+    "first_entry": "When the player enters, the door slams shut and its echo travels through the entrance hall. The air smells of damp wood, dust, and something faintly metallic. Portraits seem to follow the player with their eyes.",
+    "friend_first_warning": "The friend is pale and exhausted, but relieved to see the player. He warns: 'Whatever you do, don't answer it.'",
+    "friend_explanation": "When pressed, he struggles to explain that the house remembers—not merely holding memories, but collecting and twisting them. He says he can no longer separate himself from its echoes.",
+    "thematic_line": "The house is feeding on what it remembers, and I am becoming its echo."
+  },
+  "revelation_order": [
+    {
+      "stage": "Arrival and uneasy normality",
+      "may_learn": "The friend is unwell, the house is unsettling, and he wants help. The disturbances are not yet understood."
+    },
+    {
+      "stage": "Contradictions",
+      "may_learn": "The friend speaks of his sister as living, while details about her presence and memories do not add up."
+    },
+    {
+      "stage": "Paintings and family traces",
+      "may_learn": "Portraits and family objects preserve conflicting versions of the past. Repeated observation may reveal changes."
+    },
+    {
+      "stage": "Sister's warnings",
+      "may_learn": "A figure associated with the sister warns the player to leave. Her concern and desire to preserve the family become apparent."
+    },
+    {
+      "stage": "Parents' fragments",
+      "may_learn": "The parents' lingering presences are not simply trying to frighten the player; their fragments suggest they want the repeating memory to end."
+    },
+    {
+      "stage": "Reconstructed truth",
+      "may_learn": "The player can assemble clues into the truth of the family's tragedy after the author finalizes the unresolved details."
+    }
+  ],
+  "design_constraints": {
+    "mvp": {
+      "rooms": "3–5",
+      "key_clues": 3,
+      "puzzles": 1,
+      "major_ghosts": 1,
+      "endings": "At least 2; ideally 4–5"
+    },
+    "player_agency": [
+      "The player can investigate, talk, examine objects, rest, follow or refuse warnings, and leave when possible.",
+      "Do not force one moral choice after the truth is discovered.",
+      "The player may discover the truth and still decide what to do next.",
+      "The narrator responds flexibly to unusual actions, but the engine decides whether those actions succeed."
+    ],
+    "engine_authority": [
+      "Python owns location, exits, inventory, clues, puzzle state, door locks, chapter/time progression, character condition, trust, denial, and ending eligibility.",
+      "The model may propose descriptive interpretations, but cannot mutate authoritative game state directly.",
+      "The model cannot grant items, reveal locked information, solve puzzles, unlock doors, kill or heal characters, or trigger endings without an engine result."
+    ]
+  },
+  "ending_directions": [
+    {
+      "id": "truth_and_choice",
+      "status": "PLANNED",
+      "description": "The player reconstructs the truth. The friend reacts according to his state, and the player chooses what to do next; the story does not force one resolution."
+    },
+    {
+      "id": "denial",
+      "status": "PLANNED",
+      "description": "The friend refuses or cannot accept the truth and remains bound to the house's familiar illusion."
+    },
+    {
+      "id": "escape_alone",
+      "status": "PLANNED",
+      "description": "The player leaves without saving the friend. This is a legitimate consequence of the player's choice."
+    },
+    {
+      "id": "time_runs_out",
+      "status": "OPTIONAL_PLANNED",
+      "description": "If an engine-managed condition reaches a defined threshold, the house's reality collapses and the friend may die. The model must never trigger this arbitrarily."
+    },
+    {
+      "id": "sisters_bargain",
+      "status": "OPTIONAL_PLANNED",
+      "description": "The player accepts the sister's offer to preserve the familiar illusion, leaving the morality of that choice ambiguous."
+    }
+  ],
+  "narrator_contract": {
+    "role": "Write immersive, atmospheric prose and character dialogue in response to an engine-validated action.",
+    "must_do": [
+      "Use current state and relevant canon to maintain continuity.",
+      "Describe sensory details and emotional reactions without overexplaining.",
+      "Keep player-discovered knowledge separate from hidden canon.",
+      "Respect established personalities and motivations.",
+      "Narrate failed actions as failures without quietly changing the rules."
+    ],
+    "must_not_do": [
+      "Invent or finalize the unresolved death sequence.",
+      "Reveal major secrets before the player earns them through clues or milestones.",
+      "Contradict inventory, clues, room layout, puzzle state, locks, character condition, or ending eligibility.",
+      "Treat every supernatural impression as objective fact.",
+      "Force the player to leave, stay, trust a character, forgive someone, or choose an ending.",
+      "Add a major canon fact, hidden crime, family member, or player backstory without author approval."
+    ],
+    "recommended_turn_input": [
+      "Current room and available exits",
+      "Player action",
+      "Engine result",
+      "Inventory and discovered clues",
+      "Relevant character state",
+      "Current story milestone and revelation permissions",
+      "Only the canon excerpts needed for this turn"
+    ]
+  },
+  "author_todo": [
+    "Finalize the exact cause and sequence of the family's deaths.",
+    "Define the three key clues and exactly what each establishes.",
+    "Define the puzzle, valid solution, and engine conditions for unlocking it.",
+    "Choose the MVP room map and exits.",
+    "Define explicit rules for trust, denial, and the friend's condition.",
+    "Set exact engine conditions for each ending."
+  ]
+}

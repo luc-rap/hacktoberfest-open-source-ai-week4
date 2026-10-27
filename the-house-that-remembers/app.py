@@ -1,4 +1,5 @@
 import base64
+import json
 from pathlib import Path
 
 import ollama
@@ -6,6 +7,8 @@ import streamlit as st
 
 
 MODEL_NAME = "gemma4:e4b"
+CANON_PATH = Path(__file__).resolve().parent / "story" / "canon.json"
+CANON = json.loads(CANON_PATH.read_text(encoding="utf-8"))
 
 INTRO = '''
 The letter arrived three nights ago, its paper creased and stained, the handwriting unmistakably your friend's — though the words were unlike anything you had ever known him to write.
@@ -31,16 +34,38 @@ _Did he invite you into the house… or did the house invite you in?_
 
 def generate_response():
     room = ROOMS[st.session_state.room]
+    friend = CANON["character_dynamics"]["friend"]
     system_prompt = (
         "You are the narrator for a gothic-horror interactive story, called The House That Remembers. "
-        "Respond vividly and concisely to the player's action, usually in "
-        "one or two short paragraphs. Preserve the established story and "
-        "treat the game state below as canon. Do not claim the player gained "
-        "items, discovered clues, or moved to another room unless the state "
-        "says so. Let the player choose what to do next.\n\n"
-        f"Opening introduction and story premise:\n{INTRO.strip()}\n\n"
-        "Entrance Hall description and established events:\n"
-        f"{ROOMS['Entrance Hall']['description']}\n\n"
+        "Write grounded, immersive scenes with restrained horror. Respond directly to the player's actions and preserve their freedom to choose what to do."
+        "Keep the whole reply to 2–5 short sentences. "
+        "Preserve player's agency, the story should move on after 3-4 interactions, guide the player towards next story point"
+        "Keep dialogue natural and concise. Characters should behave according to their personalities and knowledge. Avoid melodrama, excessive metaphors, repetitive descriptions, and unnecessary exposition. Ordinary, quiet moments are part of the story; not every turn needs a clue or scare."
+        "He may pause, answer briefly, trail off, or change "
+        "the subject. He does not understand the supernatural situation "
+        "clearly and cannot explain it neatly. Respond naturally to the "
+        "player's suggestions and offers; do not assume any particular "
+        "activity. When he accepts a reasonable suggestion, let him take "
+        "initiative and follow through with the next small action."
+        "Keep actions consistent with the player's choices and available "
+        "exits. Only mention shared memories or family details already "
+        "established in the conversation or canon; do not invent them. Do "
+        "not introduce a warning, clue, supernatural event, invitation, or "
+        "change of location without a reason."
+        "Preserve game state: do not claim the player gained "
+        "items, discovered clues, or changed rooms unless the state says so. "
+        "A character may invite the player to move, but the move only happens "
+        "after the player chooses it. Keep unrevealed canon secrets hidden.\n\n"
+        "Story premise:\n"
+        f"{CANON['premise']['summary']}\n\n"
+        "Friend's established characterization:\n"
+        f"Initial state: {friend['initial_state']}\n"
+        f"Early behavior: {friend['early_behavior']}\n\n"
+        f"Friend's voice: {friend['voice']}\n\n"
+        "Urgent letter the friend sent:\n"
+        f"{CANON['opening']['letter_text']}\n\n"
+        "Narrator rules:\n"
+        f"{json.dumps(CANON['narrator_contract'], ensure_ascii=False)}\n\n"
         f"Current room: {st.session_state.room}\n"
         f"Room description: {room['description']}\n"
         f"Available exits: {', '.join(room['exits'])}\n"
@@ -51,7 +76,15 @@ def generate_response():
         {"role": "system", "content": system_prompt},
         *st.session_state.history,
     ]
-    result = ollama.chat(model=MODEL_NAME, messages=messages)
+    result = ollama.chat(
+        model=MODEL_NAME,
+        messages=messages,
+        think=False,
+        options={
+            "temperature": 0.6,
+            "num_predict": 128,
+        },
+    )
     return result.message.content.strip()
 
 
@@ -121,7 +154,7 @@ ROOMS = {
             "He steps closer whispers in a voice that is barely audible\n\n"
             "\"I need your help...\""
         ),
-        "exits": ["Library", "Grand Staircase"],
+        "exits": ["Library", "Kitchen", "Grand Staircase"],
         "img": "hallway.jpg"
     },
     "Library": {
@@ -131,7 +164,14 @@ ROOMS = {
             "lower shelf, as though a book was recently removed."
         ),
         "exits": ["Entrance Hall"],
-        "img": "library.jpg"
+    },
+    "Kitchen": {
+        "description": (
+            "The narrow kitchen is cluttered but familiar. Rain ticks "
+            "against a dark window above the sink. A kettle, a chipped "
+            "teapot, and two mismatched cups sit on the counter."
+        ),
+        "exits": ["Entrance Hall"],
     },
     "Grand Staircase": {
         "description": (
@@ -140,7 +180,6 @@ ROOMS = {
             "comes the faint sound of someone humming."
         ),
         "exits": ["Entrance Hall"],
-        "img": "staircase.jpg"
     },
 }
 
@@ -293,6 +332,18 @@ if action:
     if "letter opener" in text or "opener" in text:
         if "Silver letter opener" not in st.session_state.inventory:
             st.session_state.inventory.append("Silver letter opener")
+
+    elif destination := next(
+        (
+            exit_name
+            for exit_name in ROOMS[st.session_state.room]["exits"]
+            if exit_name.lower() in text
+        ),
+        None,
+    ):
+        st.session_state.room = destination
+        if destination not in st.session_state.visited:
+            st.session_state.visited.append(destination)
 
     elif "library" in text:
         if st.session_state.room != "Library":
