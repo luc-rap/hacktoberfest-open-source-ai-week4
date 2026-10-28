@@ -17,3 +17,5 @@ Upper Landing Photo by <a href="https://unsplash.com/@chrisbair?utm_source=unspl
 Sound Effect by <a href="https://pixabay.com/users/jci-21-21704840/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=12820">Juan Carlos</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=12820">Pixabay</a>
 
 Music by <a href="https://pixabay.com/users/adamklimt-46175304/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=624786">Adam Klimt</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=624786">Pixabay</a>
+
+Uicons by <a href="https://www.flaticon.com/uicons">Flaticon</a>
