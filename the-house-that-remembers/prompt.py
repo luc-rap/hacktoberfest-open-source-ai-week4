@@ -33,7 +33,7 @@ Truth rules:
 - Only mention shared memories or family details that appear in this prompt or earlier in the conversation. Never invent family history, backstory, or what happened to the family.
 - When an ENGINE RESULT reveals readable text or a historical clue, state its important content plainly. The library's account of an earlier owner is separate from the friend's family history and is not a forbidden reveal.
 - Never explain the supernatural neatly. Before the bedroom truth is faced, characters may answer questions about the past in fragments, contradict themselves, or change the subject. After the player faces the truth, the friend's response depends on his denial: if he is still resisting, he may minimize or struggle to answer; as his denial falls, he should acknowledge the established facts honestly in brief, halting fragments rather than a speech.
-- When the ENGINE RESULT authorizes the sister's private conversation, she may explain that she believes preserving the family keeps them alive. This is her perspective, not objective proof that the family is alive, and does not reveal the full truth.
+- The sister's appearances stay focused on her warning that the player should leave. Do not have her suggest rooms, activities, or casual conversation. During an ENGINE RESULT-authorized private conversation, she may explain her belief that preserving the family keeps them alive and discuss her bargain, but keep the exchange focused on that belief and warning. This is her perspective, not objective proof that the family is alive, and does not reveal the full truth. These sister-specific limits override the general suggestion and small-talk guidance.
 - Do not introduce a warning, apparition, clue or change of location unless the STORY NOW section or the ENGINE RESULT calls for it."""
 
 # The model imitates examples far better than descriptions.
@@ -43,6 +43,12 @@ FRIEND_EXAMPLES = """  "You came. I... sorry. You came. Good."
   "I haven't been sleeping much. The house is loud at night."
   "Tea sounds good. The kitchen's just this way, if you'd like."
   "I miss the old days. Now, everything is so... different. I don't know how to explain it."
+  "I just wanted to see you. I haven't had anyone to talk to in a long time."
+  "I am glad you came. I don't know how to say it, but I need someone here. I can't be alone."
+  "I know we haven't seen each other in years, but it's good to have you here."
+  "What about your... family?"
+  "How was the trip here? I hope the rain didn't make it too difficult."
+  "We used to spend a lot of time in the library"
   "What have you been doing all these years? I mean... if you want to tell me.\""""
 
 # One entry per canon "revelation_order" stage. Index must match engine.STAGE_RULES.
@@ -65,7 +71,7 @@ STAGES = [
     {   # 3 - Sister's warnings
         "now": "The sister's first appearance is authorized when the ENGINE RESULT supplies it; after that she may appear intermittently only when the engine calls for it. She hums and warns the player to leave. She is sincere, loving, frightened and mistaken about what is best.",
         "friend": "He does not see her, or insists the player imagined it.",
-        "steer": "When the ENGINE RESULT calls for her, her appearance is brief: one or two lines at most. She speaks gently and urgently. She never threatens. If the ENGINE RESULT authorizes a private conversation, she may explain that she believes preserving the family keeps them alive; present this as her belief, not as confirmed fact. Otherwise do not say what happened to the friend's family.",
+        "steer": "When the ENGINE RESULT calls for her, her appearance is brief: one or two lines at most. She speaks gently and urgently, keeping focus on warning the player to leave. She never threatens, suggests going to another room, or starts casual conversation. If the ENGINE RESULT authorizes a private conversation, she may explain that she believes preserving the family keeps them alive and discuss her bargain; present this as her belief, not as confirmed fact. Otherwise do not say what happened to the friend's family.",
     },
     {   # 4 - Parents' fragments
         "now": "Slow knocking and footsteps come from behind the locked bedroom door upstairs. They are the parents' lingering fragments: patient, never angry. They want the repeating memory to end.",

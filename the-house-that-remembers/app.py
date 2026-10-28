@@ -264,14 +264,14 @@ h1, h2, h3 {
     line-height: 1.55;
 }
 .st-key-scene_panel,
-.st-key-conversation_panel {
+.st-key-conversation_frame {
     position: relative;
     outline: 1px solid rgba(176, 132, 82, 0.28);
     outline-offset: -1px;
     border-radius: 4px;
 }
 .st-key-scene_panel::before,
-.st-key-conversation_panel::before {
+.st-key-conversation_frame::before {
     content: "";
     position: absolute;
     inset: 5px;
@@ -523,25 +523,21 @@ with scene_column:
 with conversation_column:
     thinking_placeholder = st.empty()
     st.markdown("### What will you do?")
-    with st.container(
-        height=480,
-        border=True,
-        autoscroll=True,
-        key="conversation_panel",
-    ):
-        for message in game["history"]:
-            with st.chat_message(
-                message["role"],
-                avatar="🕯️" if message["role"] == "assistant" else "🧑",
-            ):
-                st.markdown(message["content"])
+    with st.container(key="conversation_frame"):
+        with st.container(height=480, border=True, autoscroll=True):
+            for message in game["history"]:
+                with st.chat_message(
+                    message["role"],
+                    avatar="🕯️" if message["role"] == "assistant" else "🧑",
+                ):
+                    st.markdown(message["content"])
 
-        if game["ending"]:
-            st.markdown("---")
-            st.markdown("**THE END**")
+            if game["ending"]:
+                st.markdown("---")
+                st.markdown("**THE END**")
 
-        if "ollama_error" in st.session_state:
-            st.error(st.session_state.ollama_error)
+            if "ollama_error" in st.session_state:
+                st.error(st.session_state.ollama_error)
 
     action = st.chat_input(
         "Describe what you do...",

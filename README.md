@@ -33,6 +33,8 @@ _Your friend invited you here for help. But as you stare into the darkness beyon
 
 _Did he invite you into the house… or did the house invite you in?_
 
+![Screenshot from the game](the-house-that-remembers/assets/game-screenshot.png)
+
 ### Tips for interacting with the story
 
 Describe your actions, lot of things are allowed! Think about your goal and what you are hoping to achieve. There is no right or wrong way to play this game. This games is based on TTRPG-style of games, where you are role-playing a character. The model serves as "DM" (Dungeon Master) - the narrator. He is the storyteller, the referee, maintains the setting in which the game is happening, and plays roles of "NPCs" (non-player characters). 

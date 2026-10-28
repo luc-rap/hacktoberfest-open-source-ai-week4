@@ -287,7 +287,7 @@ ROOMS = {
         "exits": ["Upper Landing"],
         "img": "bedroom.jpg",
         "aliases": ["parents' bedroom", "parents bedroom", "parent's bedroom", "parents' room",
-                    "parents room", "master bedroom", "bedroom"],
+                    "parents room", "master bedroom", "bedroom", "room"],
         "features": {
             "bed": {
                 "keywords": ["bed", "figures", "family", "mother", "father", "sister", "parents"],
