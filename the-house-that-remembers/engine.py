@@ -8,22 +8,81 @@ from pprint import pprint
 
 
 # Slow clue drip: during quiet turns the engine surfaces one small detail.
-AMBIENT_AFTER_TURNS = 2   # turns spent in a room before a detail may surface
+AMBIENT_AFTER_TURNS = 3   # turns spent in a room before a detail may surface
 AMBIENT_COOLDOWN = 3      # minimum turns between any two noticed details
 FRAGMENT_CLUES_NEEDED = 2  # clues of one kind needed to complete a memory fragment
+FRAGMENT_KINDS = ("past", "present", "echoes")
+FRAGMENT_LABELS = {
+    "past": "Past",
+    "present": "Present",
+    "echoes": "Echoes",
+}
 DOOR_DENIAL_MAX = 3        # friend's denial must be at or below this to open the door
 PUSH_LIMIT = 3             # blunt confrontations before the evidence -> he shuts down
 SUPPORT_LIMIT = 3          # times kindness can lower his denial
-MAX_TURNS = 90             # truth not faced by then -> "denial" ending
-NUDGE_AFTER_TURNS = 5
+MAX_TURNS = 90             # unresolved truth or denial by then -> "denial" ending
+NUDGE_AFTER_TURNS = 4
 NUDGE_COOLDOWN = 3
+SISTER_COOLDOWN = 12
+SISTER_CONVERSATION_LIMIT = 5
+
+FINAL_REVELATIONS = (
+    {
+        "id": "mother",
+        "title": "His mother's decline",
+        "detail": (
+            "They are dead. The house drained them, beginning with his mother, who "
+            "grew exhausted and unable to sleep and sensed something was wrong. The "
+            "room was preserved, so they look as if they are sleeping."
+        ),
+    },
+    {
+        "id": "father",
+        "title": "His father's attempt to preserve them",
+        "detail": (
+            "After help failed, his father became frightened and tried to preserve "
+            "the family unchanged. He locked himself, his wife, and his daughter in "
+            "the bedroom and told his son never to open the door. He thought he was "
+            "protecting them, but shut them away from help; they died there, drained "
+            "by the house."
+        ),
+    },
+    {
+        "id": "sister",
+        "title": "His sister's hope",
+        "detail": (
+            "His sister kept trying to hold the family together and urged her brother "
+            "not to give up on them. Now she clings to the house's preserved illusion, "
+            "believing it keeps her family together; her warnings to leave are real, "
+            "but she mistakes letting go for losing them."
+        ),
+    },
+    {
+        "id": "friend",
+        "title": "Why he stayed silent",
+        "detail": (
+            "He had argued with his father and believed the others were overreacting. "
+            "He knocked once, heard no answer, and obeyed the last order out of anger "
+            "and fear. Since then he has pretended they were still alive and resting, "
+            "unable to face that he never opened the door."
+        ),
+    },
+)
+
+SISTER_PRESERVATION_MEMORY = (
+    "She believes the family is still together as long as the house preserves them "
+    "exactly as they were. To her, keeping things unchanged is a way of keeping them "
+    "alive; she warns the player away because she fears that facing the truth will "
+    "make her lose them."
+)
 
 # ---------------------------------------------------------------------------
 # World data
 # ---------------------------------------------------------------------------
 # "features" are things the player can examine/take. "looks" is what each
-# successive examination reveals (the last entry repeats). "clue" is
-# (clue text, examination number on which it is found).
+# successive examination reveals (the last entry repeats). Each "clue" is
+# (clue text, examination number, fragment kind); None marks a discovery that
+# does not count toward fragment progress.
 ROOMS = {
     "Entrance Hall": {
         "description": (
@@ -48,7 +107,7 @@ ROOMS = {
                 "looks": [
                     "A tall clock stands against the wall, its hands stopped at a quarter past three. The pendulum hangs perfectly still. The clock hasn't moved. Nothing in this hall ticks.",
                 ],
-                "clues": [("The clock on the wall is frozen at 3:15", 1, 'rules')],
+                "clues": [("The clock on the wall is frozen at 3:15", 1, 'past')],
                 "friend": "He says it only needs winding, then changes the subject.",
             },
         },
@@ -71,6 +130,7 @@ ROOMS = {
                     "The gap is still there. Nothing nearby explains where the missing book went.",
                 ],
                 "clues": [("A book was recently removed from the shelf", 1, None)],
+                "friend": "He says he doesn't remember taking a book, and changes the subject.",
             },
             "footsteps": {
                 "ambient": True,
@@ -79,7 +139,8 @@ ROOMS = {
                     "From somewhere above, a few slow footsteps cross the ceiling. After a pause, the very same footsteps cross it again.",
                     "The footsteps repeat, exactly the same, as though something is replaying.",
                 ],
-                "clues": [("The same few footsteps repeat overhead", 1, 'night')],
+                "clues": [("The same few footsteps repeat overhead", 1, 'echoes')],
+                "friend": "He says it is only the house settling, and changes the subject.",
             },
             "photos": {
                 "ambient": True,
@@ -88,18 +149,29 @@ ROOMS = {
                     "The family photos are blurred and unrecognizable. You can't make out any faces.",
                     "The photos remain blurred. You can't tell who they are.",
                 ],
-                "clues": [("Family photos on the wall are blurred and unrecognizable", 1, None)],
+                "clues": [("Family photos on the wall are blurred and unrecognizable", 1, 'past')],
+                "friend": "He says the photos are just old and faded.",
             },
             
             "history": {
                 "ambient": True,
-                "keywords": ["book", "history", "pamphlet", "volume", "reading table"],
+                "keywords": [
+                    "book",
+                    "history",
+                    "pamphlet",
+                    "volume",
+                    "reading table",
+                    "page",
+                    "passage",
+                    "text",
+                ],
                 "takeable": "Library Book",
                 "looks": [
                     "The missing book lies open on a reading table: a water-stained local history. One passage tells of the house's first owner, who buried his sister before she was truly gone and died soon after. The house stood empty for years before anyone came.",
                     "The page hasn't changed. The ink is faded, but the passage is still legible.",
                 ],
                 "clues": [("The house's first owner buried his sister alive and died soon after; the house stood empty for years", 1, None)],
+
             },
         },
     },
@@ -119,7 +191,7 @@ ROOMS = {
                     "Two cups wait by the teapot. Then you notice a third at the far end of the table, set out and untouched.",
                     "The third cup hasn't moved. It sits exactly where someone would put it for a guest.",
                 ],
-                "clues": [("A third cup sits set out at the table, as if someone else were expected", 1, 'routine')],
+                "clues": [("A third cup sits set out at the table, as if someone else were expected", 1, 'present')],
                 "friend": "If he notices the player noticing, he glances away and changes the subject.",
             },
             "chair": {
@@ -129,7 +201,7 @@ ROOMS = {
                     "One chair at the table is pulled out slightly, as though someone had only just stood up from it.",
                     "The chair stays where it is. The seat is cold.",
                 ],
-                "clues": [("A kitchen chair is pulled out, as though someone had just stood up", 1, 'routine')],
+                "clues": [("A kitchen chair is pulled out, as though someone had just stood up", 1, 'present')],
             },
             "food": {
                 "ambient": True,
@@ -139,7 +211,7 @@ ROOMS = {
                     "The plate of food remains. It is cold, but the smell is still faintly familiar.",
                     "It seems like the food has been sitting there for a while, but it isn't spoiled."
                 ],
-                "clues": [("A plate of food sits on the counter, untouched", 1, 'routine'), ("The food has sat out for ages but has not spoiled", 3, None)],
+                "clues": [("A plate of food sits on the counter, untouched", 1, 'present'), ("The food has sat out for ages but has not spoiled", 3, 'present')],
             },
             "calendar": {
                 "ambient": True,
@@ -147,7 +219,7 @@ ROOMS = {
                 "looks": [
                     "The calendar on the wall is turned to March, but the year is faded and unreadable. It is currently October.",
                 ],
-                "clues": [("The calendar on the wall is turned to March, but it is currently October. Year is faded and unreadable", 1, 'rules')],
+                "clues": [("The calendar on the wall is turned to March, but it is currently October. Year is faded and unreadable", 1, 'past')],
             },
         },
     },
@@ -178,7 +250,7 @@ ROOMS = {
                     "The humming drifts down from above. When you look up, it falters, then starts again from the beginning.",
                     "The same melody, again, from the very beginning.",
                 ],
-                "clues": [("The humming upstairs falters whenever you listen", 1, 'night')],
+                "clues": [("The humming upstairs falters whenever you listen", 1, 'echoes')],
                 "friend": "He seems not to hear it, or says it is only the house.",
             },
         },
@@ -192,19 +264,19 @@ ROOMS = {
         "exits": ["Grand Staircase", "Parents' Bedroom"],
         "img": "upper_landing.jpg",
         "gated": {"Parents' Bedroom": "door_open"},
-        "aliases": ["upper landing", "upstairs landing", "landing", "upper floor", "second floor"],
+        "aliases": ["upper landing", "upstairs landing", "landing", "upper floor", "second floor", "upstairs", "first floor", "second story"],
         "features": {
             "door": {
                 "ambient": True,
                 "keywords": ["door", "note", "knock", "knocking"],
                 "takeable": "Upper Landing Note",
                 "looks": [
-                    "The parents' bedroom door is shut. The folded note taped to its frame reads, in a careful hand: 'Do not open. Do not change anything.'",
+                    "The parents' bedroom door is shut. The folded note taped to its frame reads, in a careful hand:\n'Do not open\n\nDo not change\n\nI have to keep things as they are.'",
                     "You press your ear to the wood. From inside comes a slow knock, three times. Then nothing.",
                 ],
                 "clues": [
-                    ("A note on the parents' bedroom door reads: do not open, do not change anything", 1, "rules"),
-                    ("Slow knocking comes from inside the locked bedroom", 2, "night"),
+                    ("A note on the parents' bedroom door reads: do not open; do not change; I have to keep things as they are", 1, "past"),
+                    ("Slow knocking comes from inside the locked bedroom", 2, "echoes"),
                 ],
                 "friend": "He will not come near the door.",
             },
@@ -221,11 +293,12 @@ ROOMS = {
                 "keywords": ["bed", "figures", "family", "mother", "father", "sister", "parents"],
                 "looks": ["Three figures lie together on the bed, turned toward one another, as if asleep. None of them breathes, and nothing about them has changed at all."],
             },
+
         },
     },
 }
 
-# Which fragment each clue belongs to, built from ROOMS.
+# Fragment progress includes only clues with an assigned fragment kind.
 CLUE_FRAGMENT = {
     text: frag
     for room in ROOMS.values()
@@ -255,6 +328,7 @@ VERTICAL = {
 def new_game():
     return {
         "room": "Entrance Hall",
+        "friend_room": "Entrance Hall",
         "inventory": ["The Letter"],
         "clues": [],
         "visited": ["Entrance Hall"],
@@ -266,11 +340,19 @@ def new_game():
         "last_notice_turn": -99, # turn_count when a detail was last surfaced
         "last_nudge_turn": -99,  # turn_count when the friend was last nudged
         "nudges_here": 0,          # nudges in this room since last move (escalate)
+        "last_sister_turn": -99,
+        "sister_warning_count": 0,
+        "sister_bargain_available": False,
+        "sister_bargain_heard": False,
+        "sister_present": False,
+        "sister_conversation_turns": 0,
         "denial": 8,             # friend's denial (high = deflecting)
         "pushed": 0,
         "support_given": 0,
         "door_open": False,        # whether the parents' bedroom door is open
         "truth_known": False,       # whether the player has learned the truth about the house
+        "final_revelations": [],   # authored family memories shared by the friend
+        "sister_seen": False,
         "ending": None,          # None or an ending id
         "last_result": None,     # engine result for the current turn
         "history": [{"role": "assistant", "content": "\"You came. I didn't think you would... Thank you.\"\n\n"}],
@@ -278,14 +360,29 @@ def new_game():
         "summary_idx": 0,        # history[:summary_idx] is already summarized
     }
 
-def fragments_complete(game):
-    """Set of completed fragment kinds ('routine', 'rules', 'night')."""
-    counts = {}
+def fragment_progress(game):
+    """Return clue counts and completion status for each memory fragment."""
+    counts = {kind: 0 for kind in FRAGMENT_KINDS}
     for clue in game["clues"]:
         frag = CLUE_FRAGMENT.get(clue)
         if frag:
             counts[frag] = counts.get(frag, 0) + 1
-    return {f for f, n in counts.items() if n >= FRAGMENT_CLUES_NEEDED}
+    return {
+        kind: {
+            "found": counts[kind],
+            "complete": counts[kind] >= FRAGMENT_CLUES_NEEDED,
+        }
+        for kind in FRAGMENT_KINDS
+    }
+
+
+def fragments_complete(game):
+    """Set of completed fragment kinds ('past', 'present', 'echoes')."""
+    return {
+        kind
+        for kind, progress in fragment_progress(game).items()
+        if progress["complete"]
+    }
  
  
 def exit_labels(game, room_name):
@@ -314,6 +411,16 @@ TOGETHER_RE = re.compile(
     r"\b(leave|go|walk|get out|come|take him|lead him)\b.*\b(together|with me|with him)\b"
     r"|\b(together|with me)\b.*\b(leave|go|out)\b"
     r"|\blet'?s (leave|get out)\b"
+)
+SISTER_ACCEPT_RE = re.compile(
+    r"\b(?:i accept|i agree to (?:your|the) (?:offer|bargain)|"
+    r"i choose (?:to accept|your offer|the offer|your bargain|the bargain)|"
+    r"i'll do it|i will do it|i want them to stay|"
+    r"i want to keep them as they are|i want to preserve them)\b"
+)
+SISTER_PERSPECTIVE_RE = re.compile(
+    r"\b(why|what|how|who|where|when|do you|are you|can you|could you|"
+    r"tell me|explain|your (side|belief|perspective))\b|\?"
 )
 
 # "look around", "what do I see?", "examine the kitchen" ...
@@ -346,6 +453,11 @@ FAMILY_RE = re.compile(r"\b(mother|mom|mum|father|dad|sister|parents|family)\b")
 SUPPORT_RE = re.compile(
     r"\b(comfort|reassure|hug|not your fault|i'?m here|i am here|here for you|not alone|safe)\b"
     r"|\bit'?s (ok|okay|alright)\b"
+    r"|\b(?:we can (?:do (?:it|this)|face (?:it|this)|get through (?:it|this))"
+    r"|we(?:'ll| will) face (?:it|this)) together\b"
+    r"|\b(?:it'?s|it is) going to be (?:ok|okay|alright)\b"
+    r"|\b(?:i want to help|i can help|let me help|i'?d like to help)\b"
+    r"|\b(?:take my hand|give me your hand)\b"
 )
 
 def _mentions(text, words):
@@ -354,6 +466,13 @@ def _mentions(text, words):
 
 def _find_rooms(text):
     return [name for name, r in ROOMS.items() if _mentions(text, r["aliases"])]
+
+
+def _remove_inventory_mentions(text, inventory):
+    """Keep room names inside carried item names from becoming movement targets."""
+    for item in sorted(inventory, key=len, reverse=True):
+        text = re.sub(rf"\b{re.escape(item.lower())}\b", " ", text)
+    return text
 
 
 def _find_feature(text, room):
@@ -371,6 +490,7 @@ def _end(game, ending, detail):
 def _classify_intent(raw_action, game):
     """Classify what the player is doing so narration responds appropriately."""
     action_text = QUOTED_TEXT_RE.sub("", raw_action).lower()
+    action_text = _remove_inventory_mentions(action_text, game["inventory"])
     room = ROOMS[game["room"]]
 
     if MEMORY_RE.search(raw_action.lower()):
@@ -381,7 +501,11 @@ def _classify_intent(raw_action, game):
         return "examination"
 
     has_quoted_speech = bool(QUOTED_TEXT_RE.search(raw_action))
-    has_speech = has_quoted_speech or bool(SPEECH_RE.search(action_text))
+    has_speech = (
+        has_quoted_speech
+        or bool(SPEECH_RE.search(action_text))
+        or bool(SUPPORT_RE.search(action_text))
+    )
     has_physical_action = bool(PHYSICAL_ACTION_RE.search(action_text))
     if has_speech and has_physical_action:
         return "action_and_dialogue"
@@ -435,25 +559,31 @@ def _unfinished(game, room_name):
     return room_name not in game["visited"] or _next_unnoticed(game, room_name) is not None
  
  
-def _path_step(game, start, goal_fn):
-    """Breadth-first search over open exits. Returns (first step, goal room) or None."""
+def _path_to(game, start, goal_fn):
+    """Breadth-first search over open exits. Returns the route and goal room."""
     from collections import deque
     seen = {start}
-    queue = deque([(start, None)])
+    queue = deque([(start, [])])
     while queue:
-        room, first = queue.popleft()
+        room, path = queue.popleft()
         for nxt in ROOMS[room]["exits"]:
             gate = ROOMS[room].get("gated", {}).get(nxt)
             if (gate and not game[gate]) or nxt in seen:
                 continue
             seen.add(nxt)
-            step = first or nxt
+            route = [*path, nxt]
             if goal_fn(nxt):
-                return step, nxt
-            queue.append((nxt, step))
+                return route, nxt
+            queue.append((nxt, route))
     return None
- 
- 
+
+
+def _path_step(game, start, goal_fn):
+    """Return the first room on the shortest open route to a goal."""
+    hit = _path_to(game, start, goal_fn)
+    return (hit[0][0], hit[1]) if hit else None
+
+
 def _nudge(game):
     """Hint for steering a lingering player onward. None if there is nowhere to send them."""
     room_name = game["room"]
@@ -498,30 +628,55 @@ def _try_door(game):
     if game["door_open"]:
         return _result("no_change", "The bedroom door already stands open.")
     if len(fragments_complete(game)) < 3:
-        return _result(
+        return _door_attempt_with_knocking(
+            game,
+            _result(
             "blocked",
             "The door will not give. It is not only locked: pushing at it feels like pushing "
             "against something holding its breath. The friend begs the player to leave it. "
             "The player does not yet understand enough to know why it matters.",
             friend="He is frightened and pleads with the player to step away.",
+            ),
         )
     if game["denial"] > DOOR_DENIAL_MAX:
-        return _result(
-            "blocked",
-            "The door stays shut. The friend's hand closes on the player's arm. He is not ready, "
-            "and the door will not open until he is.",
-            friend="He is trembling and cannot let the player open it yet.",
+        return _door_attempt_with_knocking(
+            game,
+            _result(
+                "blocked",
+                "The door stays shut. The friend's hand closes on the player's arm. He is not ready, "
+                "and the door will not open until he is.",
+                friend="He is trembling and cannot let the player open it yet.",
+            ),
         )
     game["door_open"] = True
-    game["denial"] = min(game["denial"], 2)
     return _result(
         "door_opened",
         "The door opens at last, without resistance, as if it had only ever been waiting. "
         "Cold, still air spills out. The friend stands frozen beside the player. "
         "The player has not yet gone in.",
     )
- 
- 
+
+
+def _record_door_knocking(game):
+    door = ROOMS["Upper Landing"]["features"]["door"]
+    clue = next(
+        text for text, _examination_number, fragment in door["clues"]
+        if fragment == "echoes" and "knocking" in text.lower()
+    )
+    if clue in game["clues"]:
+        return None
+    game["clues"].append(clue)
+    return clue
+
+
+def _door_attempt_with_knocking(game, result):
+    clue = _record_door_knocking(game)
+    if clue:
+        result["new_clue"] = clue
+        result["detail"] += " As the player tests it, three slow knocks answer from within."
+    return result
+
+
 def _confront(game):
     if len(fragments_complete(game)) >= 3:
         game["denial"] = max(0, game["denial"] - 1)
@@ -554,15 +709,51 @@ def _resolve(game, text):
     text = QUOTED_TEXT_RE.sub("", text).lower()    # actions only: speech can't move or examine things
     room_name = game["room"]
     room = ROOMS[room_name]
-    rooms_named = _find_rooms(text)
+    room_parse_text = _remove_inventory_mentions(text, game["inventory"])
+    rooms_named = _find_rooms(room_parse_text)
     negated = bool(NEGATION_RE.search(text))
     spoken_negated = bool(NEGATION_RE.search(spoken))
+
+    if (
+        game.get("sister_bargain_available")
+        and game["friend_room"] != game["room"]
+        and not spoken_negated
+        and SISTER_ACCEPT_RE.search(spoken)
+    ):
+        if not game.get("sister_bargain_heard"):
+            return _result(
+                "blocked",
+                "The sister has not explained her bargain yet. The player cannot "
+                "accept it before hearing what she believes.",
+            )
+        return _end(
+            game,
+            "sisters_bargain",
+            "The player accepts the sister's bargain and chooses to leave alone, "
+            "carrying her partial account of the family's fate.",
+        )
 
     # --- leaving (irreversible, so be strict) -------------------------------
     # "Let's leave together" is something the player says, so quoted speech counts.
     if game["truth_known"] and not spoken_negated and TOGETHER_RE.search(spoken):
-        return _end(game, "leave_together",
-                    "The player and the friend choose to leave the house together.")
+        if game["denial"] >= 3:
+            return _result(
+                "blocked",
+                "The friend is not ready to leave together yet. He has seen the truth "
+                "but is still resisting it; do not make him agree or move toward the exit.",
+            )
+        if len(game.get("final_revelations", [])) < len(FINAL_REVELATIONS):
+            return _result(
+                "blocked",
+                "The friend is not ready to leave together yet. There are still family "
+                "memories he has not been able to share; do not make him agree or end "
+                "the story now.",
+            )
+        return _end(
+            game,
+            "leave_together",
+            "The player and the friend choose to leave the house together.",
+        )
  
     if LEAVE_RE.search(text) and not negated:
         if room_name == "Entrance Hall":
@@ -591,30 +782,32 @@ def _resolve(game, text):
             elif re.search(r"\b(down|downstairs)\b", text) and (room_name, "down") in VERTICAL:
                 target = VERTICAL[(room_name, "down")]
         if target:
-            if target in room["exits"]:
-                flag = room.get("gated", {}).get(target)
-                if flag and not game[flag]:
-                    return _result(
-                        "blocked",
-                        f"The door to the {target} is shut and locked. It will not simply open; "
-                        "the player would have to try the door itself.",
-                    )
-                first_time = target not in game["visited"]
+            route = _path_to(game, room_name, lambda r: r == target)
+            if route:
+                path, _ = route
+                first_time_rooms = []
+                for step in path:
+                    if step not in game["visited"]:
+                        game["visited"].append(step)
+                        first_time_rooms.append(step)
+                    if step == "Parents' Bedroom":
+                        game["truth_known"] = True
                 game["room"] = target
                 game["room_turns"] = 0
                 game["nudges_here"] = 0
-                if first_time:
-                    game["visited"].append(target)
-                if target == "Parents' Bedroom":
-                    game["truth_known"] = True
-                    game["denial"] = min(game["denial"], 1)
                 detail = f"The player moved to the {target}."
-                if first_time:
-                    detail += " It is their first time in this room."
+                if len(path) > 1:
+                    detail += f" They passed through {', '.join(path[:-1])} on the way."
+                if first_time_rooms:
+                    detail += (
+                        f" First visit to: {', '.join(first_time_rooms)}."
+                    )
+                if game["friend_room"] != target:
+                    detail += f" The friend remains in the {game['friend_room']}."
                 return _result("moved", detail)
             return _result(
                 "blocked",
-                f"The {target} cannot be reached directly from the {room_name}. "
+                f"The {target} cannot be reached from the {room_name}. "
                 f"Reachable from here: {', '.join(exit_labels(game, room_name))}.",
             )
         if room_name in rooms_named:
@@ -640,6 +833,10 @@ def _resolve(game, text):
     ):
         name, feat = found
         noticed, new_clue = _examine(game, room_name, name, feat)
+        item = feat.get("takeable")
+        if item and item not in game["inventory"]:
+            game["inventory"].append(item)
+            noticed += f" The {item} is added to the player's inventory."
         return _result(
             "examined",
             f"The player examined the {name}. They notice: {noticed}",
@@ -648,7 +845,7 @@ def _resolve(game, text):
         )
 
     # --- looking around in general: reveal the next unnoticed detail ---------
-    if LOOK_AROUND_RE.search(text):
+    if LOOK_AROUND_RE.search(room_parse_text):
         nxt = _next_unnoticed(game, room_name)
         if nxt:
             name, feat = nxt
@@ -703,12 +900,40 @@ def _advance_stage(game):
 
 def apply_action(game, raw_action):
     """Resolve one player action, update game state, return the engine result."""
+    game.setdefault("friend_room", "Entrance Hall")
+    game.setdefault("sister_seen", False)
+    game.setdefault("last_sister_turn", -99)
+    game.setdefault("sister_warning_count", 0)
+    game.setdefault("sister_bargain_available", False)
+    game.setdefault("sister_bargain_heard", False)
+    game.setdefault("sister_present", False)
+    game.setdefault("sister_conversation_turns", 0)
+    game.setdefault("final_revelations", [])
     text = raw_action.lower()
     intent = _classify_intent(raw_action, game)   # classify before the action can change the room
+    sister_appearance_due = (
+        not game["sister_seen"]
+        or game["turn_count"] + 1 - game["last_sister_turn"] >= SISTER_COOLDOWN
+    )
+    private_sister_due = (
+        game["stage"] >= 3
+        and sister_appearance_due
+        and not game["ending"]
+        and game["sister_warning_count"] >= 2
+        and not game["sister_bargain_heard"]
+        and game["friend_room"] != game["room"]
+    )
+    speaking_with_sister = (
+        (game["sister_present"] or private_sister_due)
+        and intent in {"dialogue", "action_and_dialogue"}
+        and not game["ending"]
+        and game["friend_room"] != game["room"]
+    )
     seen_before = len(game["examined"])           # measured BEFORE resolving, so first looks count as fresh
     result = _resolve(game, text)
     if result["outcome"] == "moved":
         intent = "movement"
+        game["sister_present"] = False
     elif result["outcome"] == "picked_up":
         intent = "physical_action"
     elif result["outcome"] == "examined" and intent not in {
@@ -717,6 +942,18 @@ def apply_action(game, raw_action):
     }:
         intent = "examination"
     result["intent"] = intent
+    if (
+        intent in {"dialogue", "action_and_dialogue"}
+        and not game["ending"]
+        and game["friend_room"] != game["room"]
+        and not speaking_with_sister
+    ):
+        game["friend_room"] = game["room"]
+        result["friend_arrived"] = True
+        result["detail"] += (
+            f" The friend joins the player in the {game['room']} so they can speak "
+            "face to face."
+        )
 
     game["turn_count"] += 1
     game["turns_in_stage"] += 1
@@ -738,11 +975,10 @@ def apply_action(game, raw_action):
             result["new_clue"] = new_clue
             result["friend"] = result["friend"] or feat.get("friend")
  
-    # Kindness lowers his guard a little (a few times only).
+    # Kindness lowers his guard a little, including after the truth is faced.
     if (
         result["outcome"] == "no_change"
         and not game["ending"]
-        and not game["truth_known"]
         and game["support_given"] < SUPPORT_LIMIT
         and SUPPORT_RE.search(text)
     ):
@@ -750,8 +986,12 @@ def apply_action(game, raw_action):
         game["denial"] = max(0, game["denial"] - 1)
         result["friend"] = result["friend"] or "He softens a little at the kindness; his guard lowers for a moment."
  
-    # Time runs out if the truth was never faced.
-    if not game["ending"] and not game["truth_known"] and game["turn_count"] >= MAX_TURNS:
+    # Time runs out if the truth was never faced or the friend remains in denial.
+    if (
+        not game["ending"]
+        and game["turn_count"] >= MAX_TURNS
+        and (not game["truth_known"] or game["denial"] >= 3)
+    ):
         result = _end(game, "denial", "Too much time has passed. The house closes around the friend.")
  
     # "Fresh" = the player met something new this turn (first look at a feature, or a clue).
@@ -779,7 +1019,64 @@ def apply_action(game, raw_action):
     if result["new_clue"]:
         for _ in result["new_clue"].split("; "):
             game["denial"] = max(0, game["denial"] - 1)
+
+    if (
+        game["truth_known"]
+        and game["denial"] < 3
+        and game["friend_room"] == game["room"]
+        and intent in {"dialogue", "action_and_dialogue"}
+        and result["outcome"] not in {"blocked", "ending"}
+        and len(game["final_revelations"]) < len(FINAL_REVELATIONS)
+    ):
+        revelation = FINAL_REVELATIONS[len(game["final_revelations"])]
+        game["final_revelations"].append(revelation["id"])
+        result["family_memory"] = revelation
+
     result["stage_advanced"] = _advance_stage(game)
+    sister_due = (
+        not game["sister_seen"]
+        or game["turn_count"] - game["last_sister_turn"] >= SISTER_COOLDOWN
+    )
+    if game["stage"] >= 3 and sister_due and not game["ending"]:
+        can_speak_privately = (
+            game["sister_warning_count"] >= 2
+            and not game["sister_bargain_heard"]
+            and game["friend_room"] != game["room"]
+        )
+        if can_speak_privately:
+            appearance = (
+                "The sister appears again, but this time she does not repeat her "
+                "warning. With the friend elsewhere, she looks directly at the player "
+                "and seems willing to explain why she wants the family left undisturbed."
+            )
+            game["sister_bargain_available"] = True
+            game["sister_present"] = True
+            game["sister_conversation_turns"] = 0
+        else:
+            appearance = (
+                "A faint figure resolves into the friend's sister. She appears briefly "
+                "and says, 'You shouldn't be here. Please. It's safer if you go.' "
+                "Then she is gone."
+                if not game["sister_seen"]
+                else "The friend's sister appears briefly again and quietly repeats her "
+                "warning to leave. Then she is gone."
+            )
+            game["sister_warning_count"] = min(2, game["sister_warning_count"] + 1)
+            game["sister_present"] = False
+        game["sister_seen"] = True
+        game["last_sister_turn"] = game["turn_count"]
+        result["sister"] = appearance
+        result["sister_private_encounter"] = can_speak_privately
+
+    if speaking_with_sister and result["outcome"] not in {"ending", "blocked"}:
+        result["sister_conversation"] = True
+        if SISTER_PERSPECTIVE_RE.search(raw_action.lower()):
+            game["sister_bargain_heard"] = True
+            result["sister_perspective"] = SISTER_PRESERVATION_MEMORY
+        game["sister_conversation_turns"] += 1
+        if game["sister_conversation_turns"] >= SISTER_CONVERSATION_LIMIT:
+            game["sister_present"] = False
+            result["sister_departed"] = True
 
     game["last_result"] = result
     print("Game state:")

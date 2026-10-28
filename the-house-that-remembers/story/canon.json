@@ -100,13 +100,13 @@
     "friend": {
       "initial_state": "Pale, exhausted, frightened, and genuinely glad the player has arrived. He wants help but is not ready to face everything.",
       "personality": "Anxious, frightened, withdrawn, sleep deprived, glad to see the player.",
-      "early_behavior": "He may try to spend ordinary, comforting time with the player—reading, watching a film, or talking as old friends would.",
+      "early_behavior": "Before the bedroom truth is faced, he sometimes initiates gentle small talk or asks about the player's life, drawing only on established childhood memories such as playing outside, helping with kitchen chores, exploring the library, and sleepovers. After the player enters the bedroom and learns the truth, he does not initiate small talk or pivot to ordinary topics; conversation stays with the family, grief, and the player's immediate choices.",
       "voice": "Frightened, exhausted, and emotionally withdrawn, trying to act normal. Speak plainly and hesitantly. Use pauses, short answers, and occasional unfinished thoughts.",
       "contradiction": "He speaks of his whole family as alive and resting (mother resting, father busy, sister around) without noticing the contradiction.",
       "progression": "As clues are found his denial drops. Blunt confrontation before the evidence makes him shut down. The engine owns the numbers."
     },
     "sister_ghost": {
-      "initial_visibility": "Intermittent; do not make her presence constant.",
+      "initial_visibility": "The engine guarantees her first brief appearance once the story reaches the sister's-warnings stage; later appearances remain intermittent and engine-authorized.",
       "motivation": "Preserve the family and the familiar version of the past, even if that keeps everyone trapped in painful repetition.",
       "behavior": "Warns the player to leave, presents herself as protective, and may describe preserving the family as an act of love.",
       "limitation": "Her recollections are biased by grief and denial. She is not a perfectly reliable narrator.",
@@ -133,7 +133,7 @@
     "Humming that stops whenever someone listens"
   ],
   "opening": {
-    "letter_text": "Dear friend,\n\nPlease, you must come. There are things in this house I can no longer explain. I fear it is too late for me. You are the only one I can trust.\n\nI don't know what you will find when you get here, but you must come. Please. If you care about me at all, you will come.\n\nI'll be waiting.\n\nYour friend,\nE.",
+    "letter_text": "Dear friend,\n\nPlease, you must come. There are things in this house I can no longer explain. I'm afraid it may be too late for me. You're the only person I can trust. You know me, and you know this house.\n\nI don't know what you'll find when you get here. My thoughts are harder to hold on to each day; I can't always tell what I've seen from what I remember. But please, don't give up on me. I don't know what else to do.\n\nYour friend,\nE.",
     "arrival": "During a storm, the player arrives at the family home. The windows resemble hollow eyes; ivy clings to the walls; the iron gate stands behind them, and the front door is slightly ajar.",
     "first_entry": "When the player enters, the door slams shut and its echo travels through the entrance hall. The air smells of damp wood, dust, and something faintly metallic. Portraits seem to follow the player with their eyes.",
     "friend_first_warning": "The friend is pale and exhausted, but relieved to see the player. He warns: 'Whatever you do, don't answer it.'",
@@ -170,10 +170,10 @@
   "design_constraints": {
     "mvp": {
       "rooms": "6: Entrance Hall, Library, Kitchen, Grand Staircase, Upper Landing, Parents' Bedroom (locked)",
-      "key_clues": "13 clues in three fragments (routine, rules, night)",
+      "key_clues": "11 fragment clues across three threads: Past (4), Present (4), and Echoes (3). Four additional discoveries provide atmosphere or optional lore but do not count toward fragment completion.",
       "puzzles": "1: the parents' bedroom door",
       "major_ghosts": 1,
-      "endings": "3 implemented (leave_together, escape_alone, denial); 1 optional (sisters_bargain)"
+      "endings": "4 implemented (leave_together, escape_alone, denial, sisters_bargain)"
     },
     "player_agency": [
       "The player can investigate, talk, examine objects, rest, follow or refuse warnings, and leave when possible.",
@@ -192,7 +192,7 @@
       "id": "leave_together",
       "status": "IMPLEMENTED",
       "description": "True good ending. The player assembles the fragments, opens the door, the friend faces what happened, and they leave the house together.",
-      "engine_condition": "Bedroom door opened, truth known, player chooses to leave with the friend."
+      "engine_condition": "Bedroom door opened, truth known, denial below 3, all four authored family memories shared, and player chooses to leave with the friend."
     },
     {
       "id": "escape_alone",
@@ -208,8 +208,8 @@
     },
     {
       "id": "sisters_bargain",
-      "status": "OPTIONAL_NOT_IMPLEMENTED",
-      "description": "The player accepts the sister's offer to keep the illusion alive. The morality is left ambiguous."
+      "status": "IMPLEMENTED",
+      "description": "After at least two warning appearances, the sister privately explains that preserving the family is how she believes she keeps them alive. She stays for up to five conversation turns, then vanishes; the player can still explicitly accept her bargain afterward. The friend must be elsewhere when she appears and when the bargain is accepted. This path is available whether or not the bedroom door has been opened."
     }
   ],
   "narrator_contract": {
@@ -240,7 +240,6 @@
     ]
   },
   "author_todo": [
-    "Decide whether to implement the optional 'sisters_bargain' ending.",
     "Write a few sister ghost lines for stage 3 in her own voice.",
     "Playtest pacing knobs: AMBIENT_AFTER_TURNS, AMBIENT_COOLDOWN, MAX_TURNS, PUSH_LIMIT."
   ],
@@ -250,14 +249,18 @@
     "delivery": "Found only in a water-stained local history in the library. Never explained by characters. The house is still haunted by this and other past tragedies."
   },
   "memory_fragments": {
-    "description": "Three kinds of clue. Finding two clues of a kind completes that fragment. Completing all three lets the player try the bedroom door.",
-    "routine": "The friend is still keeping house for people who are not there. Clues: third cup, pulled-out chair, food that never spoils.",
-    "rules": "The father's preservation. Clues: the stopped hall clock, the outdated calendar, the note on the bedroom door.",
-    "night": "What happened at the door. Clues: repeating footsteps overhead, the humming, the slow knocking from inside the bedroom."
+    "description": "Eleven clues are assigned to three kinds of fragment: Past (4), Present (4), and Echoes (3). Finding any two clues in a kind completes that fragment. Four additional discoveries provide atmosphere or optional lore and do not count toward fragment completion. The sidebar tracks each category and the total out of three. Completing all three lets the player try the bedroom door.",
+    "past": "Traces of the family's history and decisions. Clues: the stopped hall clock, the outdated calendar, the blurred family photos, and the note on the bedroom door.",
+    "present": "Signs of ordinary domestic life continuing unnaturally. Clues: the third cup, the pulled-out chair, the untouched plate of food, and the food that never spoils.",
+    "echoes": "Sounds the house repeats or holds onto. Clues: repeating footsteps overhead, the humming, and slow knocking from inside the bedroom.",
+    "other_discoveries": "These do not count toward a memory fragment: the musty smell, the missing-book gap, the local-history account of the previous owner, and the changing portrait."
   },
   "engine_rules": {
     "denial": "Friend's denial runs 0-10. It starts high and drops by 1 for each clue found and each of up to 3 kind gestures. Blunt confrontation before all three fragments raises it by 1.",
     "door": "The bedroom door opens only if all three fragments are complete and denial is at or below 3. Opening it moves the story to the final stage.",
+    "family_revelations": "After the player enters the bedroom, face-to-face conversation shares four authored family memories one at a time when denial is below 3: the mother's decline and the family's deaths, the father's attempt to preserve them, the sister's hope, and the friend's conflict and silence.",
+    "together_ending": "The friend can leave together only after denial is below 3 and all four family memories have been shared.",
+    "sister_bargain": "After the sister has warned the player at least twice, when the cooldown passes and the friend is elsewhere, she may privately explain her belief that preserving the family keeps them alive. She remains for five conversation turns, then vanishes; the player can still explicitly accept the bargain after she leaves, while the friend is elsewhere. This conversation and ending may happen before or after the bedroom is opened. The player leaves alone with her partial truth.",
     "pushing": "Three blunt confrontations before the evidence ends the story in the denial ending.",
     "clock": "If the truth has not been faced after about 90 turns, the denial ending triggers."
   }

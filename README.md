@@ -35,7 +35,7 @@ _Did he invite you into the house… or did the house invite you in?_
 
 ### Tips for interacting with the story
 
-Describe your actions, you're not stuck, and a lot of things are allowed! Think about your goal and what you are hoping to achieve. There is no right or wrong way to play this game. This games is based on TTRPG-style of games, where you are role-playing a character. The model serves as "DM" (Dungeon Master) - the narrator. He is the storyteller, the referee, maintains the setting in which the game is happening, and plays roles of "NPCs" (non-player characters). 
+Describe your actions, lot of things are allowed! Think about your goal and what you are hoping to achieve. There is no right or wrong way to play this game. This games is based on TTRPG-style of games, where you are role-playing a character. The model serves as "DM" (Dungeon Master) - the narrator. He is the storyteller, the referee, maintains the setting in which the game is happening, and plays roles of "NPCs" (non-player characters). 
 
 The narrator distinguishes spoken dialogue, physical actions, exploration, and
 questions about the player's memories. You can make the intent clear in natural
@@ -45,10 +45,12 @@ language:
 - Combine speech and an action: `I pat him on the back and say, "Let's go."`
 - Explore or examine: `Look around` or `Examine the family photos.`
 - Recall an established memory: `What do I remember about my friend?`
-- Move: `I walk to the library.`
+- Move directly to a destination, even when it is several rooms away: `I go to the upper landing.`
+- Examine a book or note to read it and add it to your inventory; no separate pickup command is needed.
 
-Memory answers are limited to details already established in the story; the
-narrator should not invent shared history.
+The sidebar tracks the Past, Present, and Echoes fragments needed to finish the story. Two clues in each category complete a fragment; the house also holds
+atmospheric and optional lore discoveries that do not count toward fragment
+progress.
 
 ### Run the Streamlit app
 

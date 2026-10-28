@@ -6,7 +6,17 @@ from pathlib import Path
 import ollama
 import streamlit as st
 
-from engine import ROOMS, apply_action, new_game
+from engine import (
+    FINAL_REVELATIONS,
+    FRAGMENT_LABELS,
+    FRAGMENT_KINDS,
+    FRAGMENT_CLUES_NEEDED,
+    ROOMS,
+    apply_action,
+    fragment_progress,
+    fragments_complete,
+    new_game,
+)
 from prompt import build_messages, generation_options, maybe_summarize, tidy
 
 st.set_page_config(page_title="The House That Remembers", layout="wide")
@@ -19,7 +29,7 @@ INTRO = '''
 The letter arrived three nights ago, its paper creased and stained, the handwriting unmistakably your friend's — though the words were unlike anything you had ever known him to write.
 
 _"Please, you must come. There are things in this house I can no longer explain. 
-I fear it is too late for me. You are the only one I can trust."_
+I'm afraid it may be too late for me. You're the only person I can trust."_
 
 Now, you stand before his home.
 Rain lashes against your face, and thunder rolls across the darkened sky. The house looms above you, its crooked silhouette barely visible through the mist. Tall, narrow windows stare down like hollow eyes. Ivy claws at the weathered stone walls, and the iron gates behind you groan in the wind, slowly swinging shut.
@@ -57,6 +67,35 @@ def show_image(path, **kwargs):
         st.image(path, **kwargs)
     else:
         st.caption(f"(image not found: {Path(path).name})")
+
+
+@st.dialog("The Letter", width="small")
+def show_letter_dialog():
+    letter_path = Path(__file__).resolve().parent / "assets" / "letter.png"
+    show_image(letter_path, width="stretch")
+
+
+@st.dialog("The Book", width="small")
+def show_book_dialog():
+    book_path = Path(__file__).resolve().parent / "assets" / "book.png"
+    show_image(book_path, width="stretch")
+    st.markdown(
+        '**"The Fall of the House of Usher" by Edgar Allan Poe is a short story '
+        "first published in 1839. A narrator visits his ailing childhood friend "
+        "Roderick Usher at his decaying family mansion. There he encounters "
+        "Roderick's mysterious twin sister Madeline, who suffers from a strange "
+        "illness. As the atmosphere grows increasingly oppressive, the house "
+        "itself seems alive with malevolent energy. When Madeline is entombed "
+        "within the estate, terrifying sounds begin echoing through the halls, "
+        "building toward a shocking climax that binds the fate of the twins to "
+        'their ancestral home."**'
+    )
+
+
+@st.dialog("The Note", width="small")
+def show_note_dialog():
+    note_path = Path(__file__).resolve().parent / "assets" / "note.png"
+    show_image(note_path, width="stretch")
 
 
 def play_background_music(file_path, loop=True):
@@ -134,10 +173,44 @@ with st.sidebar:
     st.markdown("### 📍 Current location")
     st.write(game["room"])
 
+    st.markdown("### 🧍 Friend")
+    friend_room = game.get("friend_room", "Entrance Hall")
+    st.write("Here with you" if friend_room == game["room"] else f"In the {friend_room}")
+
+    st.markdown("### 🧩 Memory fragments")
+    completed_fragments = len(fragments_complete(game))
+    st.write(f"**{completed_fragments}/3 complete**")
+    fragment_status = fragment_progress(game)
+    for kind in FRAGMENT_KINDS:
+        progress = fragment_status[kind]
+        marker = "✓" if progress["complete"] else "○"
+        st.caption(
+            f"{marker} {FRAGMENT_LABELS[kind]}: "
+            f"{progress['found']}/{FRAGMENT_CLUES_NEEDED} clues"
+        )
+
+    if game.get("truth_known"):
+        st.markdown("### 🕯️ Family memories")
+        shared_memories = game.get("final_revelations", [])
+        st.write(f"**{len(shared_memories)}/{len(FINAL_REVELATIONS)} remembered**")
+        for memory in FINAL_REVELATIONS:
+            if memory["id"] in shared_memories:
+                st.caption(f"✓ {memory['title']}")
+
     st.markdown("### 🎒 Inventory")
     if game["inventory"]:
         for item in game["inventory"]:
-            st.write(f"• {item}")
+            if item == "The Letter":
+                if st.button("📜 The Letter  🔍", key="open_letter"):
+                    show_letter_dialog()
+            elif item == "Library Book":
+                if st.button("📖 Library Book  🔍", key="open_book"):
+                    show_book_dialog()
+            elif item == "Upper Landing Note":
+                if st.button("📝 Upper Landing Note  🔍", key="open_note"):
+                    show_note_dialog()
+            else:
+                st.write(f"• {item}")
     else:
         st.caption("Your pockets are empty.")
 
