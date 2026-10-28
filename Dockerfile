@@ -24,4 +24,4 @@ ENV PATH="/opt/venv/bin:$PATH" \
 
 EXPOSE 10000
 
-CMD ["/bin/sh", "/app/start.sh"]
+ENTRYPOINT ["/bin/sh", "/app/start.sh"]
