@@ -34,21 +34,21 @@ ROOMS = {
         ),
         "exits": ["Library", "Kitchen", "Grand Staircase"],
         "img": "hallway.jpg",
-        "aliases": ["entrance hall", "entrance", "hallway", "hall", "foyer", "downstairs"],
+        "aliases": ["entrance hall", "entrance", "hallway", "hall", "foyer"],
         "features": {
             "smell": {
                 "ambient": True,
-                "keywords": ["smell", "scent", "old", "dusty", "odor"],
+                "keywords": ["smell", "scent", "odor", "musty"],
                 "looks": ["A musty smell lingers in the air, a mixture of old wood and dust."],
-                "clue": ("A musty smell lingers in the air", 1),
+                "clues": [("A musty smell lingers in the air", 1, None)],
             },
             "clock": {
                 "ambient": True,
-                "keywords": ["clock", "time", "watch", "tick", "ticking"],
+                "keywords": ["clock", "clocks", "pendulum", "ticking"],
                 "looks": [
                     "A tall clock stands against the wall, its hands stopped at a quarter past three. The pendulum hangs perfectly still. The clock hasn't moved. Nothing in this hall ticks.",
                 ],
-                "clue": ("The clock on the wall is frozen at 3:15", 1),
+                "clues": [("The clock on the wall is frozen at 3:15", 1, 'rules')],
                 "friend": "He says it only needs winding, then changes the subject.",
             },
         },
@@ -65,12 +65,12 @@ ROOMS = {
         "features": {
             "shelf": {
                 "ambient": True,
-                "keywords": ["shelf", "shelves", "gap", "book", "books", "bookshelf", "bookshelves"],
+                "keywords": ["shelf", "shelves", "gap", "books", "bookshelf", "bookshelves"],
                 "looks": [
                     "The dust on a lower shelf is disturbed by a narrow, clean gap where a book was recently removed.",
                     "The gap is still there. Nothing nearby explains where the missing book went.",
                 ],
-                "clue": ("A book was recently removed from the shelf", 1),
+                "clues": [("A book was recently removed from the shelf", 1, None)],
             },
             "footsteps": {
                 "ambient": True,
@@ -79,7 +79,7 @@ ROOMS = {
                     "From somewhere above, a few slow footsteps cross the ceiling. After a pause, the very same footsteps cross it again.",
                     "The footsteps repeat, exactly the same, as though something is replaying.",
                 ],
-                "clue": ("The same few footsteps repeat overhead", 1),
+                "clues": [("The same few footsteps repeat overhead", 1, 'night')],
             },
             "photos": {
                 "ambient": True,
@@ -88,19 +88,20 @@ ROOMS = {
                     "The family photos are blurred and unrecognizable. You can't make out any faces.",
                     "The photos remain blurred. You can't tell who they are.",
                 ],
-                "clue": ("Family photos on the wall are blurred and unrecognizable", 1),
+                "clues": [("Family photos on the wall are blurred and unrecognizable", 1, None)],
             },
             
             "history": {
                 "ambient": True,
-                "keywords": ["book", "history", "pamphlet", "volume", "table", "reading table"],
+                "keywords": ["book", "history", "pamphlet", "volume", "reading table"],
+                "takeable": "Library Book",
                 "looks": [
                     "The missing book lies open on a reading table: a water-stained local history. One passage tells of the house's first owner, who buried his sister before she was truly gone and died soon after. The house stood empty for years before anyone came.",
                     "The page hasn't changed. The ink is faded, but the passage is still legible.",
                 ],
                 "clues": [("The house's first owner buried his sister alive and died soon after; the house stood empty for years", 1, None)],
+            },
         },
-    }
     },
     "Kitchen": {
         "description": (
@@ -118,7 +119,7 @@ ROOMS = {
                     "Two cups wait by the teapot. Then you notice a third at the far end of the table, set out and untouched.",
                     "The third cup hasn't moved. It sits exactly where someone would put it for a guest.",
                 ],
-                "clue": ("A third cup sits set out at the table, as if someone else were expected", 1),
+                "clues": [("A third cup sits set out at the table, as if someone else were expected", 1, 'routine')],
                 "friend": "If he notices the player noticing, he glances away and changes the subject.",
             },
             "chair": {
@@ -128,25 +129,25 @@ ROOMS = {
                     "One chair at the table is pulled out slightly, as though someone had only just stood up from it.",
                     "The chair stays where it is. The seat is cold.",
                 ],
-                "clue": ("A kitchen chair is pulled out, as though someone had just stood up", 1),
+                "clues": [("A kitchen chair is pulled out, as though someone had just stood up", 1, 'routine')],
             },
             "food": {
                 "ambient": True,
-                "keywords": ["food", "meal", "dinner", "breakfast", "lunch", "plate", "plates", "dish", "dishes"],
+                "keywords": ["food", "plate", "plates", "dish", "dishes"],
                 "looks": [
                     "A plate of food sits on the counter, untouched. The smell is faint but familiar.",
                     "The plate of food remains. It is cold, but the smell is still faintly familiar.",
                     "It seems like the food has been sitting there for a while, but it isn't spoiled."
                 ],
-                "clue": ("A plate of food sits on the counter, untouched", 1),
+                "clues": [("A plate of food sits on the counter, untouched", 1, 'routine'), ("The food has sat out for ages but has not spoiled", 3, None)],
             },
             "calendar": {
                 "ambient": True,
-                "keywords": ["calendar", "date", "month", "day", "year"],
+                "keywords": ["calendar", "date", "dates"],
                 "looks": [
                     "The calendar on the wall is turned to March, but the year is faded and unreadable. It is currently October.",
                 ],
-                "clue": ("The calendar on the wall is turned to March, but it is currently October. Year is faded and unreadable", 1),
+                "clues": [("The calendar on the wall is turned to March, but it is currently October. Year is faded and unreadable", 1, 'rules')],
             },
         },
     },
@@ -167,7 +168,7 @@ ROOMS = {
                     "The portrait hangs crookedly. The faces are hard to make out in the dim light.",
                     "The portrait is different from before. Something about the faces has shifted, though you can't say what.",
                 ],
-                "clue": ("The portrait on the landing changed between looks", 2),
+                "clues": [("The portrait on the landing changed between looks", 2, None)],
                 "friend": "He will not look at it.",
             },
             "humming": {
@@ -177,7 +178,7 @@ ROOMS = {
                     "The humming drifts down from above. When you look up, it falters, then starts again from the beginning.",
                     "The same melody, again, from the very beginning.",
                 ],
-                "clue": ("The humming upstairs falters whenever you listen", 1),
+                "clues": [("The humming upstairs falters whenever you listen", 1, 'night')],
                 "friend": "He seems not to hear it, or says it is only the house.",
             },
         },
@@ -196,6 +197,7 @@ ROOMS = {
             "door": {
                 "ambient": True,
                 "keywords": ["door", "note", "knock", "knocking"],
+                "takeable": "Upper Landing Note",
                 "looks": [
                     "The parents' bedroom door is shut. The folded note taped to its frame reads, in a careful hand: 'Do not open. Do not change anything.'",
                     "You press your ear to the wood. From inside comes a slow knock, three times. Then nothing.",
@@ -212,17 +214,17 @@ ROOMS = {
         "description": ("The parents' bedroom is cold and perfectly still. Three figures lie together on the bed, turned toward one another, as if asleep. No dust has settled on anything here. The air smells faintly of cold metal."),
         "exits": ["Upper Landing"],
         "img": "bedroom.jpg",
-        "aliases": ["parents' bedroom", "bedroom", "parents' room"],
+        "aliases": ["parents' bedroom", "parents bedroom", "parent's bedroom", "parents' room",
+                    "parents room", "master bedroom", "bedroom"],
         "features": {
             "bed": {
                 "keywords": ["bed", "figures", "family", "mother", "father", "sister", "parents"],
                 "looks": ["Three figures lie together on the bed, turned toward one another, as if asleep. None of them breathes, and nothing about them has changed at all."],
             },
         },
-    }
-
+    },
 }
-    
+
 # Which fragment each clue belongs to, built from ROOMS.
 CLUE_FRAGMENT = {
     text: frag
@@ -317,7 +319,7 @@ TOGETHER_RE = re.compile(
 # "look around", "what do I see?", "examine the kitchen" ...
 LOOK_AROUND_RE = re.compile(
     r"\b(look|glance|scan|survey|search|explore|examine|inspect|study)\w*\b.*\b(around|about|room|surroundings|area)\b"
-    r"|\b(examine|inspect|search|study|explore|look)\w*\b.*\b(kitchen|library|hall|staircase)\b"
+    r"|\b(examine|inspect|search|study|explore|look)\w*\b.*\b(kitchen|library|hall|staircase|landing|bedroom)\b"
     r"|\bwhat (do|can) i (see|notice|find)\b|\bnotice anything\b"
 )
 QUOTED_TEXT_RE = re.compile(r'"[^"]*"|“[^”]*”|‘[^’]*’')
@@ -392,6 +394,7 @@ def _classify_intent(raw_action, game):
 
 def _result(outcome, detail, new_clue=None, ambient=None, friend=None):
     return {
+        "nudge": None,        # gentle push to move on (set by apply_action)
         "outcome": outcome,
         "detail": detail,
         "new_clue": new_clue,
@@ -547,14 +550,17 @@ def _confront(game):
 
 def _resolve(game, text):
     intent = _classify_intent(text, game)
-    text = QUOTED_TEXT_RE.sub("", text).lower()
+    spoken = text                                  # full text, quoted speech included
+    text = QUOTED_TEXT_RE.sub("", text).lower()    # actions only: speech can't move or examine things
     room_name = game["room"]
     room = ROOMS[room_name]
     rooms_named = _find_rooms(text)
     negated = bool(NEGATION_RE.search(text))
+    spoken_negated = bool(NEGATION_RE.search(spoken))
 
-  # --- leaving (irreversible) -------------------------------
-    if game["truth_known"] and not negated and TOGETHER_RE.search(text):
+    # --- leaving (irreversible, so be strict) -------------------------------
+    # "Let's leave together" is something the player says, so quoted speech counts.
+    if game["truth_known"] and not spoken_negated and TOGETHER_RE.search(spoken):
         return _end(game, "leave_together",
                     "The player and the friend choose to leave the house together.")
  
@@ -569,7 +575,8 @@ def _resolve(game, text):
             return _try_door(game)
  
     # --- blunt confrontation about the family ---------------------------------
-    if (not game["truth_known"] and CONFRONT_RE.search(text) and FAMILY_RE.search(text)):
+    # Confronting him is also said aloud, so quoted speech counts here too.
+    if (not game["truth_known"] and CONFRONT_RE.search(spoken) and FAMILY_RE.search(spoken)):
         return _confront(game)
 
     # --- movement -----------------------------------------------------------
@@ -595,6 +602,7 @@ def _resolve(game, text):
                 first_time = target not in game["visited"]
                 game["room"] = target
                 game["room_turns"] = 0
+                game["nudges_here"] = 0
                 if first_time:
                     game["visited"].append(target)
                 if target == "Parents' Bedroom":
@@ -663,7 +671,7 @@ def _resolve(game, text):
         "Nothing the engine tracks changed. Treat the action as ordinary roleplay "
         "(talking, resting, small gestures). Do not add items, clues, or events. "
         f"No room change happens: the player is still in the {room_name}, and nobody "
-        f"leads them elsewhere unless they choose an exit ({', '.join(room['exits'])}).",
+        f"leads them elsewhere unless they choose an exit ({', '.join(exit_labels(game, room_name))}).",
     )
 
 
@@ -696,9 +704,9 @@ def _advance_stage(game):
 def apply_action(game, raw_action):
     """Resolve one player action, update game state, return the engine result."""
     text = raw_action.lower()
-    result = _resolve(game, raw_action.lower())
-    intent = _classify_intent(raw_action, game)
-    seen_before = len(game["examined"])
+    intent = _classify_intent(raw_action, game)   # classify before the action can change the room
+    seen_before = len(game["examined"])           # measured BEFORE resolving, so first looks count as fresh
+    result = _resolve(game, text)
     if result["outcome"] == "moved":
         intent = "movement"
     elif result["outcome"] == "picked_up":
@@ -772,6 +780,8 @@ def apply_action(game, raw_action):
         for _ in result["new_clue"].split("; "):
             game["denial"] = max(0, game["denial"] - 1)
     result["stage_advanced"] = _advance_stage(game)
- 
+
     game["last_result"] = result
+    print("Game state:")
+    pprint(game, sort_dicts=False)
     return result

@@ -41,23 +41,23 @@ STAGES = [
     },
     {   # 1 - Contradictions
         "now": "Details about the friend's family do not quite add up.",
-        "friend": "He once mentions his sister casually, in the present tense, as if she is nearby, and does not notice anything odd. If asked about her, he answers vaguely and changes the subject.",
-        "steer": "Let the sister come up naturally once. Do not explain the contradiction.",
+        "friend": "He mentions his family casually, in the present tense, as if they are alive and nearby: his mother is resting, his father is busy upstairs, his sister is 'around'. He does not notice anything odd. If asked to see them, or asked directly about them, he answers vaguely and changes the subject.",
+        "steer": "Let this come up once or twice in passing, e.g. \"Mum's resting. She hasn't been sleeping well.\" Do not explain it.",
     },
-    {   # 2 - Paintings and family traces
-        "now": "Portraits and family objects preserve conflicting versions of the past. Looking again can reveal changes.",
-        "friend": "He grows uneasy when portraits or family objects are mentioned and tries to move on.",
-        "steer": "Only describe a portrait or object as changed if the ENGINE RESULT says so. Otherwise keep the house quietly wrong: a sound repeating, a door slightly off.",
+    {   # 2 - Frozen house and family traces
+        "now": "The house is frozen in time: clocks are stopped, calendars are out of date, food never spoils, and places are set for people who are not there. Portraits can change between looks. The friend has lost track of time.",
+        "friend": "He says time is 'strange' or that he has lost count of the days. He grows uneasy when stopped clocks, old dates or the extra place settings are mentioned and tries to move on.",
+        "steer": "Describe frozen or changed details only when the engine provides them. Otherwise keep the house quietly wrong: a sound repeating, a door slightly off.",
     },
     {   # 3 - Sister's warnings
-        "now": "A faint figure associated with the sister appears now and then and warns the player to leave. She is sincere, loving, frightened and mistaken about what is best.",
+        "now": "A faint figure associated with the sister appears now and then, hums, and warns the player to leave. She is sincere, loving, frightened and mistaken about what is best.",
         "friend": "He does not see her, or insists the player imagined it.",
         "steer": "Her appearances are brief and intermittent: one or two lines at most, then gone. She speaks gently and urgently, e.g. \"You shouldn't be here. Please. It's safer if you go.\" She never threatens. Do not say what happened to the family.",
     },
     {   # 4 - Parents' fragments
-        "now": "Fragments of the parents linger in echoes, objects and voices. They are not trying to frighten the player; they want the repeating memory to end.",
-        "friend": "He is shaken. Fragments of memory slip out, then he retreats.",
-        "steer": "Use incomplete echoes and half-heard voices. Contradictory impressions are fine. Never state definitive details of the family's deaths.",
+        "now": "Slow knocking and footsteps come from behind the locked bedroom door upstairs. They are the parents' lingering fragments: patient, never angry. They want the repeating memory to end.",
+        "friend": "He flinches at the knocking and tells the player, \"Whatever you do, don't answer it.\" Fragments of memory slip out, then he retreats.",
+        "steer": "Use incomplete echoes and half-heard sounds. Never state what happened to the family. The door itself opens only when the engine says so.",
     },
     {   # 5 - Reconstructed truth
         "now": "The bedroom door has opened. Inside, the family lie preserved as if asleep. The truth, to be revealed only gently and in fragments: after the father and son stopped speaking, the father locked himself, the mother and the sister in this room and told the son never to open the door. Cut off from help and drained by the house, they died inside. The friend knocked once, heard nothing, obeyed the rule out of anger and fear, and never opened it. The house kept the room as it was.",
@@ -133,14 +133,14 @@ def stage_block(game):
 
 
 def state_block(game):
-    from engine import ROOMS  # local import avoids a cycle if engine grows
+    from engine import ROOMS, exit_labels  # local import avoids a cycle if engine grows
 
     room = ROOMS[game["room"]]
     lines = [
         "CURRENT STATE",
         f"Room: {game['room']}",
         f"Room description: {room['description'].strip()}",
-        f"Exits: {', '.join(room['exits'])}",
+        f"Exits: {', '.join(exit_labels(game, game['room']))}",
         f"Inventory: {', '.join(game['inventory']) or 'empty'}",
         f"Clues the player has found: {', '.join(game['clues']) or 'none'}",
         "Established player memories: childhood companions; playing outside together; "
@@ -168,7 +168,7 @@ def _engine_note(game):
             f"without making it a big moment: {r['ambient']}"
         )
     if r.get("nudge"):
-        note +=  f"\nGentle push to move the story on (weave in naturally, never force): {r['nudge']}"
+        note += f"\nGentle push to move the story on (weave in naturally, never force): {r['nudge']}"
     if r["new_clue"]:
         note += f"\nNew clue found: {r['new_clue']}"
     if r.get("friend"):

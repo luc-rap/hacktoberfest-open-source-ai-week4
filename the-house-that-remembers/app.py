@@ -12,7 +12,6 @@ from prompt import build_messages, generation_options, maybe_summarize, tidy
 st.set_page_config(page_title="The House That Remembers", layout="wide")
 
 MODEL_NAME = "gemma4:e4b"
-PANEL_HEIGHT = 600
 CANON_PATH = Path(__file__).resolve().parent / "story" / "canon.json"
 CANON = json.loads(CANON_PATH.read_text(encoding="utf-8"))
 
@@ -52,10 +51,21 @@ def generate_response(game):
     return tidy(result.message.content)
 
 
+def show_image(path, **kwargs):
+    """Show an image, or a quiet caption if the file is missing (instead of crashing the app)."""
+    if Path(path).exists():
+        st.image(path, **kwargs)
+    else:
+        st.caption(f"(image not found: {Path(path).name})")
+
+
 def play_background_music(file_path, loop=True):
     audio_path = Path(file_path)
     if not audio_path.is_absolute():
         audio_path = Path(__file__).resolve().parent / audio_path
+    if not audio_path.exists():
+        st.caption(f"(audio not found: {audio_path.name})")
+        return
     audio_base64 = base64.b64encode(audio_path.read_bytes()).decode("ascii")
     loop_attr = "loop" if loop else ""
     st.markdown(
@@ -165,7 +175,7 @@ st.title("The House That Remembers")
 with st.expander("The letter and arrival", expanded=True):
     _, image_column, _ = st.columns([1, 2, 1])
     with image_column:
-        st.image(
+        show_image(
             Path(__file__).resolve().parent / "assets" / "haunted_house.jpg",
             width=480,
         )
@@ -178,7 +188,7 @@ with scene_column:
     with st.container(height="content", border=True):
         st.markdown(f"### 📍 {game['room']}")
         if "img" in room:
-            st.image(
+            show_image(
                 Path(__file__).resolve().parent / "assets" / room["img"],
                 width='stretch',
             )
