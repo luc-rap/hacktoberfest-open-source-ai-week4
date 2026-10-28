@@ -1,5 +1,7 @@
 # Hacktoberfest Open-Source AI - Week 4
 
+![The House That Remembers](the-house-that-remembers/assets/banner.png)
+
 ## The House That Remembers
 
 This is my submission for Hacktoberfest Open-Source AI Challenge: Week 4. This Week's Theme: Ghost in the Machine - 
