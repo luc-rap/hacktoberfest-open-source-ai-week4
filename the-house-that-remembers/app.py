@@ -1,12 +1,18 @@
 import base64
+import copy
 import json
 from pathlib import Path
 
 import ollama
 import streamlit as st
 
+from engine import ROOMS, apply_action, new_game
+from prompt import build_messages, generation_options, maybe_summarize, tidy
+
+st.set_page_config(page_title="The House That Remembers", layout="wide")
 
 MODEL_NAME = "gemma4:e4b"
+PANEL_HEIGHT = 600
 CANON_PATH = Path(__file__).resolve().parent / "story" / "canon.json"
 CANON = json.loads(CANON_PATH.read_text(encoding="utf-8"))
 
@@ -16,9 +22,13 @@ The letter arrived three nights ago, its paper creased and stained, the handwrit
 _"Please, you must come. There are things in this house I can no longer explain. 
 I fear it is too late for me. You are the only one I can trust."_
 
-Now, you stand before his ancestral home.
+Now, you stand before his home.
 Rain lashes against your face, and thunder rolls across the darkened sky. The house looms above you, its crooked silhouette barely visible through the mist. Tall, narrow windows stare down like hollow eyes. Ivy claws at the weathered stone walls, and the iron gates behind you groan in the wind, slowly swinging shut.
-Something about the place feels wrong. The air is unnaturally cold, carrying the scent of wet earth and rotting leaves. Though no lights burn inside, you cannot shake the feeling that someone is watching you from the upper windows.
+
+You remember this house from your childhood, but something about it feels wrong. 
+You used to play outside, spend time helping your friend with chores in the kitchen, explore the family library, and even sleep over in the guest room.
+
+The air is unnaturally cold, carrying the scent of wet earth and rotting leaves. Though no lights burn inside, you cannot shake the feeling that someone is watching you from the upper windows.
 
 For a moment, lightning illuminates the facade — and you could swear a shadow has just moved behind the glass.
 
@@ -32,60 +42,14 @@ _Did he invite you into the house… or did the house invite you in?_
 '''
 
 
-def generate_response():
-    room = ROOMS[st.session_state.room]
-    friend = CANON["character_dynamics"]["friend"]
-    system_prompt = (
-        "You are the narrator for a gothic-horror interactive story, called The House That Remembers. "
-        "Write grounded, immersive scenes with restrained horror. Respond directly to the player's actions and preserve their freedom to choose what to do."
-        "Keep the whole reply to 2–5 short sentences. "
-        "Preserve player's agency, the story should move on after 3-4 interactions, guide the player towards next story point"
-        "Keep dialogue natural and concise. Characters should behave according to their personalities and knowledge. Avoid melodrama, excessive metaphors, repetitive descriptions, and unnecessary exposition. Ordinary, quiet moments are part of the story; not every turn needs a clue or scare."
-        "He may pause, answer briefly, trail off, or change "
-        "the subject. He does not understand the supernatural situation "
-        "clearly and cannot explain it neatly. Respond naturally to the "
-        "player's suggestions and offers; do not assume any particular "
-        "activity. When he accepts a reasonable suggestion, let him take "
-        "initiative and follow through with the next small action."
-        "Keep actions consistent with the player's choices and available "
-        "exits. Only mention shared memories or family details already "
-        "established in the conversation or canon; do not invent them. Do "
-        "not introduce a warning, clue, supernatural event, invitation, or "
-        "change of location without a reason."
-        "Preserve game state: do not claim the player gained "
-        "items, discovered clues, or changed rooms unless the state says so. "
-        "A character may invite the player to move, but the move only happens "
-        "after the player chooses it. Keep unrevealed canon secrets hidden.\n\n"
-        "Story premise:\n"
-        f"{CANON['premise']['summary']}\n\n"
-        "Friend's established characterization:\n"
-        f"Initial state: {friend['initial_state']}\n"
-        f"Early behavior: {friend['early_behavior']}\n\n"
-        f"Friend's voice: {friend['voice']}\n\n"
-        "Urgent letter the friend sent:\n"
-        f"{CANON['opening']['letter_text']}\n\n"
-        "Narrator rules:\n"
-        f"{json.dumps(CANON['narrator_contract'], ensure_ascii=False)}\n\n"
-        f"Current room: {st.session_state.room}\n"
-        f"Room description: {room['description']}\n"
-        f"Available exits: {', '.join(room['exits'])}\n"
-        f"Inventory: {', '.join(st.session_state.inventory) or 'empty'}\n"
-        f"Clues: {', '.join(st.session_state.clues) or 'none'}"
-    )
-    messages = [
-        {"role": "system", "content": system_prompt},
-        *st.session_state.history,
-    ]
+def generate_response(game):
     result = ollama.chat(
         model=MODEL_NAME,
-        messages=messages,
+        messages=build_messages(game, CANON),
         think=False,
-        options={
-            "temperature": 0.6,
-            "num_predict": 128,
-        },
+        options=generation_options(game),
     )
-    return result.message.content.strip()
+    return tidy(result.message.content)
 
 
 def play_background_music(file_path, loop=True):
@@ -105,6 +69,7 @@ def play_background_music(file_path, loop=True):
         """,
         unsafe_allow_html=True,
     )
+
 
 # ---------- Styling ----------
 st.markdown("""
@@ -143,68 +108,10 @@ div[data-testid="stChatMessage"] {
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- Game data ----------
-ROOMS = {
-    "Entrance Hall": {
-        "description": (
-            "The moment you step inside, a gust of wind slips past you. The heavy front door slams shut behind you with a deafening BANG. The sound echoes through the vast entrance hall, bouncing off the high ceilings before dissolving into silence. \n\n"
-            "A figure emerges from the shadows. Your friend.\n"
-            "He looks nothing like the person you remember. His eyes are hollow, his skin pale, ghostly, and dark circles hollow his eyes.\n\n"
-            "\"You came,\" he whispers, his voice trembling. \"I didn't think anyone would.\"\n\n"
-            "He steps closer whispers in a voice that is barely audible\n\n"
-            "\"I need your help...\""
-        ),
-        "exits": ["Library", "Kitchen", "Grand Staircase"],
-        "img": "hallway.jpg"
-    },
-    "Library": {
-        "description": (
-            "Shelves of warped books climb toward a ceiling lost "
-            "in shadow. One narrow gap interrupts the dust on a "
-            "lower shelf, as though a book was recently removed."
-        ),
-        "exits": ["Entrance Hall"],
-    },
-    "Kitchen": {
-        "description": (
-            "The narrow kitchen is cluttered but familiar. Rain ticks "
-            "against a dark window above the sink. A kettle, a chipped "
-            "teapot, and two mismatched cups sit on the counter."
-        ),
-        "exits": ["Entrance Hall"],
-    },
-    "Grand Staircase": {
-        "description": (
-            "The staircase groans beneath your weight. At the "
-            "landing, a portrait hangs crookedly. From above "
-            "comes the faint sound of someone humming."
-        ),
-        "exits": ["Entrance Hall"],
-    },
-}
-
 # ---------- Session state ----------
-if "room" not in st.session_state:
-    st.session_state.room = "Entrance Hall"
-
-if "inventory" not in st.session_state:
-    st.session_state.inventory = ["The Letter"]
-
-if "clues" not in st.session_state:
-    st.session_state.clues = []
-
-if "history" not in st.session_state:
-    st.session_state.history = [
-        {
-            "role": "assistant",
-            "content": (
-                "\"I need your help...\""
-            ),
-        }
-    ]
-
-if "visited" not in st.session_state:
-    st.session_state.visited = ["Entrance Hall"]
+if "game" not in st.session_state:
+    st.session_state.game = new_game()
+game = st.session_state.game
 
 # ---------- Sidebar ----------
 with st.sidebar:
@@ -215,194 +122,132 @@ with st.sidebar:
     st.divider()
 
     st.markdown("### 📍 Current location")
-    st.write(st.session_state.room)
+    st.write(game["room"])
 
     st.markdown("### 🎒 Inventory")
-    if st.session_state.inventory:
-        for item in st.session_state.inventory:
+    if game["inventory"]:
+        for item in game["inventory"]:
             st.write(f"• {item}")
     else:
         st.caption("Your pockets are empty.")
 
     st.markdown("### 🔎 Clues")
-    if st.session_state.clues:
-        for clue in st.session_state.clues:
+    if game["clues"]:
+        for clue in game["clues"]:
             st.write(f"• {clue}")
     else:
         st.caption("Nothing discovered yet.")
 
     st.markdown("### 🗺️ Explored")
-    for room in st.session_state.visited:
-        st.write(f"✓ {room}")
+    for visited_room in game["visited"]:
+        st.write(f"✓ {visited_room}")
 
     st.divider()
 
     if st.button("Restart adventure", use_container_width=True):
-        for key in ("room", "inventory", "clues", "history", "visited"):
-            st.session_state.pop(key, None)
+        st.session_state.pop("game", None)
+        st.session_state.pop("ollama_error", None)
         st.rerun()
 
-# ---------- Main screen ----------
-st.markdown(
-    '<p class="muted">A GOTHIC HORROR ADVENTURE</p>',
-    unsafe_allow_html=True,
-)
-st.title("The House That Remembers")
-
-st.caption("CHAPTER I  ·  THE ARRIVAL")
-
-
-with st.sidebar:
     st.subheader("🔊 Atmosphere")
-
-    sound_enabled = st.checkbox(
-        "🌧️ Background rain",
-        value=True,
-    )
-
+    sound_enabled = st.checkbox("🌧️ Background rain", value=True)
     if sound_enabled:
         play_background_music(Path("assets") / "rain-and-thunder.mp3")
+    house_ambience_enabled = st.checkbox("🏚️ House ambience", value=True)
+    if house_ambience_enabled:
+        play_background_music(Path("assets") / "ambience.mp3")
 
-st.image(
-    Path(__file__).resolve().parent / "assets" / "haunted_house.jpg",
-    width='stretch'
-)
+# ---------- Main screen ----------
+st.markdown('<p class="muted">A GOTHIC HORROR ADVENTURE</p>',
+            unsafe_allow_html=True)
+st.title("The House That Remembers")
 
-st.divider()
+with st.expander("The letter and arrival", expanded=True):
+    _, image_column, _ = st.columns([1, 2, 1])
+    with image_column:
+        st.image(
+            Path(__file__).resolve().parent / "assets" / "haunted_house.jpg",
+            width=480,
+        )
+    st.markdown(INTRO)
 
-st.markdown(INTRO)
+scene_column, conversation_column = st.columns([1, 1.25], gap="large")
+room = ROOMS[game["room"]]
 
-room = ROOMS[st.session_state.room]
+with scene_column:
+    with st.container(height="content", border=True):
+        st.markdown(f"### 📍 {game['room']}")
+        if "img" in room:
+            st.image(
+                Path(__file__).resolve().parent / "assets" / room["img"],
+                width='stretch',
+            )
+        else:
+            st.caption("No image is available for this room yet.")
+        st.markdown(
+            f'<div class="story">{room["description"]}</div>',
+            unsafe_allow_html=True,
+        )
 
-st.markdown(f"### 📍 {st.session_state.room}")
-if "img" in room:
-    st.image(
-        Path(__file__).resolve().parent / "assets" / room["img"],
-        width='stretch'
+with conversation_column:
+    thinking_placeholder = st.empty()
+    st.markdown("### What will you do?")
+    with st.container(height=480, border=True, autoscroll=True):
+        for message in game["history"]:
+            with st.chat_message(
+                message["role"],
+                avatar="🕯️" if message["role"] == "assistant" else "🧑",
+            ):
+                st.markdown(message["content"])
+
+        if game["ending"]:
+            st.markdown("---")
+            st.markdown("**THE END**")
+
+        if "ollama_error" in st.session_state:
+            st.error(st.session_state.ollama_error)
+
+    action = st.chat_input(
+        "Describe what you do...",
+        disabled=bool(game["ending"]),
     )
 
-st.markdown(
-    f'<div class="story">{room["description"]}</div>',
-    unsafe_allow_html=True,
-)
-
-st.divider()
-
-# ---------- Suggested actions ----------
-# st.markdown("**What will you do?**")
-
-# col1, col2, col3 = st.columns(3)
-
-#with col1:
-#    examine = st.button("🔍 Examine surroundings",
-#                        use_container_width=True)
-
-#with col2:
-#    explore = st.button("🚪 Explore another room",
-#                        use_container_width=True)
-
-#with col3:
-#    inspect = st.button("🗝️ Inspect the letter opener",
-#                        use_container_width=True)
-
-# Convert buttons into ordinary game actions.
-action = None
-
-#if examine:
-#    action = "examine surroundings"
-#elif explore:
-#    action = "explore another room"
-#elif inspect:
-#    action = "inspect the letter opener"
-
-# ---------- Free-text action input ----------
-typed_action = st.chat_input("Describe what you do...")
-if typed_action:
-    action = typed_action
-
-# ---------- Action handling ----------
 if action:
-    st.session_state.history.append({
-        "role": "user",
-        "content": action,
-    })
+    snapshot = copy.deepcopy(game)          # restore this if the model call fails
+    game["history"].append({"role": "user", "content": action})
+    apply_action(game, action)              # Python decides what actually happened
 
-    text = action.lower()
-
-    if "letter opener" in text or "opener" in text:
-        if "Silver letter opener" not in st.session_state.inventory:
-            st.session_state.inventory.append("Silver letter opener")
-
-    elif destination := next(
-        (
-            exit_name
-            for exit_name in ROOMS[st.session_state.room]["exits"]
-            if exit_name.lower() in text
-        ),
-        None,
-    ):
-        st.session_state.room = destination
-        if destination not in st.session_state.visited:
-            st.session_state.visited.append(destination)
-
-    elif "library" in text:
-        if st.session_state.room != "Library":
-            st.session_state.room = "Library"
-            if "Library" not in st.session_state.visited:
-                st.session_state.visited.append("Library")
-
-    elif "upstairs" in text or "staircase" in text:
-        if st.session_state.room != "Grand Staircase":
-            st.session_state.room = "Grand Staircase"
-            if "Grand Staircase" not in st.session_state.visited:
-                st.session_state.visited.append("Grand Staircase")
-
-    elif "book" in text or "shelf" in text:
-        if st.session_state.room == "Library":
-            clue = "A book was recently removed from the shelf"
-            if clue not in st.session_state.clues:
-                st.session_state.clues.append(clue)
-
+    error_message = None
+    response = ""
     try:
-        with st.spinner("Thinking..."):
-            response = generate_response()
+        with thinking_placeholder.container():
+            with st.spinner("Thinking..."):
+                maybe_summarize(game, MODEL_NAME)
+                response = generate_response(game)
     except ollama.ResponseError as error:
         if error.status_code == 404:
-            st.session_state.ollama_error = (
+            error_message = (
                 f"Ollama could not find {MODEL_NAME}. "
                 f"Run `ollama pull {MODEL_NAME}` and try again."
             )
         else:
-            st.session_state.ollama_error = (
-                f"Ollama returned an error: {error.error}"
-            )
+            error_message = f"Ollama returned an error: {error.error}"
     except ollama.RequestError as error:
-        st.session_state.ollama_error = (
+        error_message = (
             "Could not connect to Ollama. Make sure Ollama is running, "
             f"then try again. Details: {error}"
         )
     else:
-        if response:
-            st.session_state.pop("ollama_error", None)
-            st.session_state.history.append({
-                "role": "assistant",
-                "content": response,
-            })
-        else:
-            st.session_state.ollama_error = (
-                "Ollama returned an empty response. Please try again."
-            )
+        if not response:
+            error_message = "Ollama returned an empty response. Please try again."
+
+    if error_message:
+        st.session_state.game = snapshot    # undo the failed turn completely
+        st.session_state.ollama_error = error_message
+    else:
+        st.session_state.pop("ollama_error", None)
+        game["history"].append({"role": "assistant", "content": response})
 
     st.rerun()
-
-# ---------- Conversation ----------
-st.markdown("### What will you do?")
-
-for message in st.session_state.history:
-    with st.chat_message(message["role"], avatar="🕯️" if message["role"] == "assistant" else "🧑"):
-        st.markdown(message["content"])
-
-if "ollama_error" in st.session_state:
-    st.error(st.session_state.ollama_error)
 
 st.caption(f"Powered by Ollama · {MODEL_NAME}")

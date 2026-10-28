@@ -12,6 +12,8 @@ Tech stack:
 - Python - for logic, validates actions, updated history, clues, inventory
 - Ollama + Gemma - narrates the permitted outcome
 
+Trigger warnings: it is a horror story! There is no gore, but there are mentions of death and similar themes. 
+
 ### Premise
 _The letter arrived three nights ago, its paper creased and stained, the handwriting unmistakably your friend's — though the words were unlike anything you had ever known him to write._
 
@@ -28,6 +30,23 @@ _The front door stands slightly ajar._
 _Your friend invited you here for help. But as you stare into the darkness beyond the threshold, a troubling thought creeps into your mind:_
 
 _Did he invite you into the house… or did the house invite you in?_
+
+### Tips for interacting with the story
+
+Describe your actions, you're not stuck, and a lot of things are allowed! Think about your goal and what you are hoping to achieve. There is no right or wrong way to play this game. This games is based on TTRPG-style of games, where you are role-playing a character. The model serves as "DM" (Dungeon Master) - the narrator. He is the storyteller, the referee, maintains the setting in which the game is happening, and plays roles of "NPCs" (non-player characters). 
+
+The narrator distinguishes spoken dialogue, physical actions, exploration, and
+questions about the player's memories. You can make the intent clear in natural
+language:
+
+- Speak to your friend: `What can I do for you?` or `I say, "Let's go."`
+- Combine speech and an action: `I pat him on the back and say, "Let's go."`
+- Explore or examine: `Look around` or `Examine the family photos.`
+- Recall an established memory: `What do I remember about my friend?`
+- Move: `I walk to the library.`
+
+Memory answers are limited to details already established in the story; the
+narrator should not invent shared history.
 
 ### Run the Streamlit app
 

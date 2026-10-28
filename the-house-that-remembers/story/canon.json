@@ -1,6 +1,6 @@
 {
   "title": "The House That Remembers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "purpose": "Authoritative canon for a standalone gothic-horror AI adventure. Python and this file define truth; the model narrates but cannot change canon or game state.",
   "genre_and_tone": {
     "genre": [
@@ -19,56 +19,58 @@
       "Use sensory details and unsettling inconsistencies rather than constant jump scares.",
       "Let ordinary, comforting moments precede uncanny events.",
       "Keep horror connected to memory, grief, and denial.",
-      "Do not imitate or quote any specific existing work.",
-      "Do not explain every strange event immediately."
+      "Do not explain every strange event immediately.",
+      "Allusions to the house's earlier tragedies are welcome as an optional easter egg, but never quote or imitate any specific existing text.",
+      "Never describe wounds, decay or gore. Use stillness, cold and grief instead."
     ]
   },
   "premise": {
-    "summary": "The player receives a desperate letter from a childhood friend and travels to his ancestral mansion. The friend is pale, exhausted, frightened, and relieved to see the player. The house appears to remember a family history its surviving resident cannot face.",
+    "summary": "The player receives a desperate letter from a childhood friend and travels to the house his family has lived in since he was a boy. The friend is pale, exhausted, frightened, and relieved to see the player. The house appears to remember a family history its surviving resident cannot face.",
     "player_role": "The player is an outsider and the friend's childhood companion. They did not cause the family's tragedy and have no secret responsibility for it.",
-    "core_question": "Can the friend face what happened to his family, and what should be done with the memories and spirits the house has preserved?",
+    "core_question": "Can the friend face what happened to his family, and can the player help him let the house's preserved memories go?",
     "core_conflict": "The parents' lingering spirits want release. The sister's ghost wants to preserve the family and believes keeping memories alive is protective. The friend is caught between denial, fear, and the possibility of remembering."
   },
   "fixed_truths": [
-    "The friend wrote the letter because his condition and the house's disturbances have become unbearable. The letter was not secretly written by the house.",
-    "The friend survived the family's tragedy.",
-    "The friend has repressed, distorted, or compartmentalized memories of the tragedy.",
-    "The friend initially believes his sister is alive; the player may initially believe this too.",
-    "The sister is a ghost, not a living person.",
-    "The sister appears intermittently and warns the player to leave. Her warnings are sincere from her point of view, though her understanding is distorted.",
-    "The sister is attached to the family and house because she believes preserving their memories can keep the family together.",
-    "The parents persist as fragmented presences associated with the family's final period in the house. They want release, not endless preservation.",
-    "The house preserves and distorts emotional memories. Its behavior should remain mysterious rather than fully explained.",
+    "The friend wrote the letter because his condition and the house's disturbances have become unbearable. The letter was not secretly written by the house. Part of him senses the truth, which is why he asked for help.",
+    "The house is genuinely haunted, and was haunted by earlier tragedies before the family moved in.",
+    "The family moved in when the friend was a child. At first things were ordinary; strange details developed slowly and were brushed off.",
+    "The house drained the family's energy, starting with the mother. It also freezes and distorts time: clocks stop, calendars stay on an old date, food does not spoil, and the friend cannot tell how much time has passed.",
+    "The mother, father and sister are dead. They died inside the parents' bedroom after being locked in and cut off from help, drained by the house. There was no violence. The house preserved the room, so they look as if they are asleep.",
+    "The friend survived. He knocked on the bedroom door once, heard no reply, and did not open it. He has pretended ever since that his family is alive and resting, and the house helps him not to see the truth.",
+    "The friend behaves as though his whole family is alive: his mother is resting, his father is busy, his sister is somewhere around.",
+    "The sister is a ghost. She roams the house, hums, appears intermittently, and warns the player to leave. Her warnings are sincere. She believes preserving the family exactly as it is keeps them alive.",
+    "The parents linger as fragments tied to the bedroom: slow knocking and footsteps. They want release, not endless preservation.",
+    "The friend's warning 'Whatever you do, don't answer it' refers to the knocking from the parents' bedroom.",
     "As the friend's denial weakens and memories return, reality becomes less consistent: paintings change, familiar spaces seem altered, sounds repeat, and doors or rooms may feel wrong.",
     "The player can leave when the game state allows it. Leaving early is a valid choice.",
-    "The player's presence gives the friend an external point of reference, but cannot magically cure him or force him to accept the truth."
+    "The player's presence gives the friend an external point of reference, but cannot cure him or force him to accept the truth. He must acknowledge it himself."
   ],
   "family_history": {
     "father": {
-      "characterization": "Became increasingly paranoid and believed the family or its memories were being taken from them. He tried to protect the family, but his attempts to control and preserve things contributed to the tragedy.",
-      "guidance": "Show fear and a distorted desire to protect, not simple villainy. Do not invent specific actions beyond established canon."
+      "characterization": "Moved the family to the house. As his wife declined and doctors could not help, he grew paranoid and began to lose himself too. His only idea was to preserve everything as it was: locking doors, stopping clocks, changing nothing. He fell out with his son over the son's denial. In the end he locked himself, his wife and his daughter in the parents' bedroom to 'preserve' them and told his son never to open the door. His attempt to protect them is what killed them.",
+      "guidance": "Show fear and a distorted desire to protect, not simple villainy."
     },
     "mother": {
-      "characterization": "Became depressed and recognized that something was wrong with the family and their situation.",
-      "guidance": "Treat her suffering seriously and compassionately, not as a supernatural explanation or moral failing."
+      "characterization": "The first to be affected. A stay-at-home mother who spent the most time in the house, she grew depressed and lethargic and could not sleep, as if the house were draining her. She recognized that something was wrong.",
+      "guidance": "Treat her suffering seriously and compassionately, never as a moral failing."
     },
     "sister": {
-      "characterization": "Tried to keep life feeling normal as the family deteriorated. After death, she clings to family memories and believes she can keep everyone together by preventing the truth from being acknowledged.",
-      "guidance": "She can be protective, loving, frightened, and deluded at once. She is not simply evil."
+      "characterization": "Supportive but cautious. She still went out for food and tried to help the family hold together, and she was protective of her brother, urging him not to give up on them. After death she clings to the family as it is, believing preservation keeps them alive.",
+      "guidance": "Protective, loving, frightened and deluded at once. Not evil."
     },
     "friend": {
-      "characterization": "Tried to keep peace and ignored or denied what was happening. He survived, but his memories of the family and its final days became fragmented or distorted.",
-      "guidance": "His condition and progression must be governed by explicit game-state rules, not arbitrary model decisions."
+      "characterization": "Lived in denial, believing the others were overreacting. He ignored his father's rules and fell out with him. He obeyed only the last one, not to open the bedroom door, out of anger and fear. He survived, but his sense of time and memory of the final days are distorted.",
+      "guidance": "His progression is governed by explicit game-state rules (denial, fragments, door), not by the model."
     },
     "tragedy_details": {
-      "status": "UNRESOLVED_CANON",
-      "instruction": "The exact sequence of deaths, immediate cause, and the friend's precise role on the final night have not yet been decided by the author. Do not invent, imply, or reveal a definitive answer. Until this is filled in, use oblique sensory fragments and contradictory recollections without establishing new facts.",
-      "questions_to_resolve": [
-        "What exactly happened on the final night?",
-        "How did the parents and sister die?",
-        "What did the father do in his attempt to protect the family?",
-        "What did the friend witness, do, or fail to do?",
-        "What physical event ended the family's lives?"
+      "status": "AUTHORED",
+      "truth": "After the father and son stopped speaking, the father locked himself, the mother and the sister in the parents' bedroom and told the son never to open the door. Cut off from help and drained by the house, they died inside. The house preserved the room as it was. The friend knocked once, heard nothing, and never opened the door, then convinced himself the family was alive.",
+      "timing": "Recent but deliberately unfixed. The house distorts time, so never give a number of days.",
+      "narration_guidance": [
+        "Reveal the truth only in the final stage, after the bedroom door is opened by the engine.",
+        "Before that, use oblique fragments only: knocking, repeating footsteps, humming, stopped clocks.",
+        "Never describe wounds, decay or gore. The family looks as if they are sleeping.",
+        "The friend should face the truth in halting fragments and quiet realization, not a lecture."
       ]
     }
   },
@@ -100,17 +102,18 @@
       "personality": "Anxious, frightened, withdrawn, sleep deprived, glad to see the player.",
       "early_behavior": "He may try to spend ordinary, comforting time with the player—reading, watching a film, or talking as old friends would.",
       "voice": "Frightened, exhausted, and emotionally withdrawn, trying to act normal. Speak plainly and hesitantly. Use pauses, short answers, and occasional unfinished thoughts.",
-      "contradiction": "He speaks of his sister as though she is alive or nearby, without recognizing the contradiction.",
-      "progression": "As memories surface, denial and physical condition may worsen. The engine determines thresholds and consequences."
+      "contradiction": "He speaks of his whole family as alive and resting (mother resting, father busy, sister around) without noticing the contradiction.",
+      "progression": "As clues are found his denial drops. Blunt confrontation before the evidence makes him shut down. The engine owns the numbers."
     },
     "sister_ghost": {
       "initial_visibility": "Intermittent; do not make her presence constant.",
       "motivation": "Preserve the family and the familiar version of the past, even if that keeps everyone trapped in painful repetition.",
       "behavior": "Warns the player to leave, presents herself as protective, and may describe preserving the family as an act of love.",
-      "limitation": "Her recollections are biased by grief and denial. She is not a perfectly reliable narrator."
+      "limitation": "Her recollections are biased by grief and denial. She is not a perfectly reliable narrator.",
+      "presence": "Roams the house. Hums. Appears briefly and intermittently."
     },
     "parents": {
-      "presence": "Mostly encountered through fragments, echoes, objects, paintings, or brief manifestations connected to the family's final period.",
+      "presence": "Concentrated in the parents' bedroom: slow knocking and footsteps.",
       "motivation": "Release from repeating memories and the house's hold.",
       "limitation": "Their fragments may be incomplete. Do not invent definitive details of the tragedy until authored."
     }
@@ -122,49 +125,55 @@
     "Footsteps or voices repeating from somewhere unseen",
     "Doors that slam or spaces that seem subtly different",
     "Ordinary activities interrupted by uncanny details",
-    "The difference between remembering someone and refusing to let them go"
+    "The difference between remembering someone and refusing to let them go",
+    "Clocks stopped at the same hour",
+    "A calendar stuck on a long-past date",
+    "Food that never spoils",
+    "Slow knocking from a locked room",
+    "Humming that stops whenever someone listens"
   ],
   "opening": {
     "letter_text": "Dear friend,\n\nPlease, you must come. There are things in this house I can no longer explain. I fear it is too late for me. You are the only one I can trust.\n\nI don't know what you will find when you get here, but you must come. Please. If you care about me at all, you will come.\n\nI'll be waiting.\n\nYour friend,\nE.",
-    "arrival": "During a storm, the player arrives at the ancestral mansion. The windows resemble hollow eyes; ivy clings to the walls; the iron gate stands behind them, and the front door is slightly ajar.",
+    "arrival": "During a storm, the player arrives at the family home. The windows resemble hollow eyes; ivy clings to the walls; the iron gate stands behind them, and the front door is slightly ajar.",
     "first_entry": "When the player enters, the door slams shut and its echo travels through the entrance hall. The air smells of damp wood, dust, and something faintly metallic. Portraits seem to follow the player with their eyes.",
     "friend_first_warning": "The friend is pale and exhausted, but relieved to see the player. He warns: 'Whatever you do, don't answer it.'",
     "friend_explanation": "When pressed, he struggles to explain that the house remembers—not merely holding memories, but collecting and twisting them. He says he can no longer separate himself from its echoes.",
-    "thematic_line": "The house is feeding on what it remembers, and I am becoming its echo."
+    "thematic_line": "The house is feeding on what it remembers, and I am becoming its echo.",
+    "friend_warning_meaning": "'Don't answer it' means the knocking from the parents' bedroom."
   },
   "revelation_order": [
     {
-      "stage": "Arrival and uneasy normality",
+      "stage": "0 Arrival and uneasy normality",
       "may_learn": "The friend is unwell, the house is unsettling, and he wants help. The disturbances are not yet understood."
     },
     {
-      "stage": "Contradictions",
-      "may_learn": "The friend speaks of his sister as living, while details about her presence and memories do not add up."
+      "stage": "1 Contradictions",
+      "may_learn": "The friend speaks of his family as alive and resting, but nothing quite adds up."
     },
     {
-      "stage": "Paintings and family traces",
-      "may_learn": "Portraits and family objects preserve conflicting versions of the past. Repeated observation may reveal changes."
+      "stage": "2 Frozen house and family traces",
+      "may_learn": "Clocks are stopped, the calendar is outdated, food never spoils, and places are set for people who are not there. Portraits change."
     },
     {
-      "stage": "Sister's warnings",
-      "may_learn": "A figure associated with the sister warns the player to leave. Her concern and desire to preserve the family become apparent."
+      "stage": "3 Sister's warnings",
+      "may_learn": "A figure associated with the sister warns the player to leave. Her concern and wish to preserve the family become apparent."
     },
     {
-      "stage": "Parents' fragments",
-      "may_learn": "The parents' lingering presences are not simply trying to frighten the player; their fragments suggest they want the repeating memory to end."
+      "stage": "4 Parents' fragments",
+      "may_learn": "Slow knocking and footsteps come from behind the locked bedroom door. The parents are not trying to frighten the player; they want the repeating memory to end."
     },
     {
-      "stage": "Reconstructed truth",
-      "may_learn": "The player can assemble clues into the truth of the family's tragedy after the author finalizes the unresolved details."
+      "stage": "5 Reconstructed truth",
+      "may_learn": "The door opens and the player sees the family, preserved as if asleep. The friend faces what he did not do."
     }
   ],
   "design_constraints": {
     "mvp": {
-      "rooms": "3–5",
-      "key_clues": 3,
-      "puzzles": 1,
+      "rooms": "6: Entrance Hall, Library, Kitchen, Grand Staircase, Upper Landing, Parents' Bedroom (locked)",
+      "key_clues": "13 clues in three fragments (routine, rules, night)",
+      "puzzles": "1: the parents' bedroom door",
       "major_ghosts": 1,
-      "endings": "At least 2; ideally 4–5"
+      "endings": "3 implemented (leave_together, escape_alone, denial); 1 optional (sisters_bargain)"
     },
     "player_agency": [
       "The player can investigate, talk, examine objects, rest, follow or refuse warnings, and leave when possible.",
@@ -180,29 +189,27 @@
   },
   "ending_directions": [
     {
-      "id": "truth_and_choice",
-      "status": "PLANNED",
-      "description": "The player reconstructs the truth. The friend reacts according to his state, and the player chooses what to do next; the story does not force one resolution."
-    },
-    {
-      "id": "denial",
-      "status": "PLANNED",
-      "description": "The friend refuses or cannot accept the truth and remains bound to the house's familiar illusion."
+      "id": "leave_together",
+      "status": "IMPLEMENTED",
+      "description": "True good ending. The player assembles the fragments, opens the door, the friend faces what happened, and they leave the house together.",
+      "engine_condition": "Bedroom door opened, truth known, player chooses to leave with the friend."
     },
     {
       "id": "escape_alone",
-      "status": "PLANNED",
-      "description": "The player leaves without saving the friend. This is a legitimate consequence of the player's choice."
+      "status": "IMPLEMENTED",
+      "description": "The player leaves the house alone and the friend stays behind, usually without ever learning what happened.",
+      "engine_condition": "Player leaves from the Entrance Hall."
     },
     {
-      "id": "time_runs_out",
-      "status": "OPTIONAL_PLANNED",
-      "description": "If an engine-managed condition reaches a defined threshold, the house's reality collapses and the friend may die. The model must never trigger this arbitrarily."
+      "id": "denial",
+      "status": "IMPLEMENTED",
+      "description": "Bad ending. The friend is too deep in denial, refuses help, and the house slowly consumes him.",
+      "engine_condition": "Player confronts him bluntly too many times before finding the evidence, or too many turns pass without the truth being faced."
     },
     {
       "id": "sisters_bargain",
-      "status": "OPTIONAL_PLANNED",
-      "description": "The player accepts the sister's offer to preserve the familiar illusion, leaving the morality of that choice ambiguous."
+      "status": "OPTIONAL_NOT_IMPLEMENTED",
+      "description": "The player accepts the sister's offer to keep the illusion alive. The morality is left ambiguous."
     }
   ],
   "narrator_contract": {
@@ -233,11 +240,25 @@
     ]
   },
   "author_todo": [
-    "Finalize the exact cause and sequence of the family's deaths.",
-    "Define the three key clues and exactly what each establishes.",
-    "Define the puzzle, valid solution, and engine conditions for unlocking it.",
-    "Choose the MVP room map and exits.",
-    "Define explicit rules for trust, denial, and the friend's condition.",
-    "Set exact engine conditions for each ending."
-  ]
+    "Decide whether to implement the optional 'sisters_bargain' ending.",
+    "Write a few sister ghost lines for stage 3 in her own voice.",
+    "Playtest pacing knobs: AMBIENT_AFTER_TURNS, AMBIENT_COOLDOWN, MAX_TURNS, PUSH_LIMIT."
+  ],
+  "house_history": {
+    "status": "OPTIONAL_EASTER_EGG",
+    "summary": "The house's first owner buried his sister before she was truly gone and died soon after. The house stood empty for years before it was put on the market and the family moved in.",
+    "delivery": "Found only in a water-stained local history in the library. Never explained by characters. The house is still haunted by this and other past tragedies."
+  },
+  "memory_fragments": {
+    "description": "Three kinds of clue. Finding two clues of a kind completes that fragment. Completing all three lets the player try the bedroom door.",
+    "routine": "The friend is still keeping house for people who are not there. Clues: third cup, pulled-out chair, food that never spoils.",
+    "rules": "The father's preservation. Clues: the stopped hall clock, the outdated calendar, the note on the bedroom door.",
+    "night": "What happened at the door. Clues: repeating footsteps overhead, the humming, the slow knocking from inside the bedroom."
+  },
+  "engine_rules": {
+    "denial": "Friend's denial runs 0-10. It starts high and drops by 1 for each clue found and each of up to 3 kind gestures. Blunt confrontation before all three fragments raises it by 1.",
+    "door": "The bedroom door opens only if all three fragments are complete and denial is at or below 3. Opening it moves the story to the final stage.",
+    "pushing": "Three blunt confrontations before the evidence ends the story in the denial ending.",
+    "clock": "If the truth has not been faced after about 90 turns, the denial ending triggers."
+  }
 }
