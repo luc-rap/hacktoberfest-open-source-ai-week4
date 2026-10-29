@@ -10,7 +10,7 @@ Layers (top to bottom):
 """
 import re
 
-import ollama
+from llm import chat
 
 CORE = """You are the narrator of a gothic-horror interactive story, "The House That Remembers".
 
@@ -28,6 +28,7 @@ Friend conversation:
 
 Truth rules:
 - The ENGINE RESULT attached to the player's message is authoritative. Narrate exactly that. If it says an action failed or nothing changed, narrate that. Do not add items, clues, opened doors or room changes. If it supplies a family memory, include that fact clearly in the friend's reply; do not replace it with a vague evasion.
+- If the ENGINE RESULT includes a new clue or ambient detail, explicitly include that discovery in the reply this turn, even while answering the player's dialogue. Weave it in briefly and naturally; do not omit it or replace it with an unrelated observation.
 - A character may suggest going somewhere, but the move only happens if the player chooses it.
 - The friend's location in CURRENT STATE is authoritative. Never have him hear or answer from another room. If the player starts a conversation while they are apart, the ENGINE RESULT normally brings him into the player's room; narrate that arrival before his reply. The exception is an ENGINE RESULT-marked private sister conversation: answer as the sister and keep the friend elsewhere.
 - Only mention shared memories or family details that appear in this prompt or earlier in the conversation. Never invent family history, backstory, or what happened to the family.
@@ -263,6 +264,11 @@ def _engine_note(game):
         note += f"\nGentle push to move the story on (weave in naturally, never force): {r['nudge']}"
     if r["new_clue"]:
         note += f"\nNew clue found: {r['new_clue']}"
+    if r.get("ambient") or r.get("new_clue"):
+        note += (
+            "\nMANDATORY NARRATION: Explicitly mention the engine-provided new clue "
+            "or ambient detail in this reply, even if the player asked a question."
+        )
     friend_is_here = game.get("friend_room", "Entrance Hall") == game["room"]
     if r.get("friend") and friend_is_here:
         note += f"\nFriend's likely reaction (optional): {r['friend']}"
@@ -379,7 +385,7 @@ SUMMARY_TRIGGER = 20   # live messages before we fold
 KEEP_RECENT = 10       # messages kept verbatim after folding
 
 
-def maybe_summarize(game, model):
+def maybe_summarize(game):
     live = game["history"][game["summary_idx"]:]
     if len(live) <= SUMMARY_TRIGGER:
         return
@@ -394,13 +400,11 @@ def maybe_summarize(game, model):
         f"Previous summary: {game['summary'] or '(none)'}\n\n"
         f"New events:\n{transcript}"
     )
-    r = ollama.chat(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        think=False,
-        options={"temperature": 0.2, "num_predict": 200, "num_ctx": 8192},
+    summary = chat(
+        [{"role": "user", "content": prompt}],
+        {"temperature": 0.2, "num_predict": 200, "num_ctx": 8192},
     )
-    summary = r.message.content.strip()
+    summary = summary.strip()
     if summary:
         game["summary"] = summary
         game["summary_idx"] += len(fold)

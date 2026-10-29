@@ -8,6 +8,13 @@ import ollama
 import streamlit as st
 from PIL import Image
 
+from llm import (
+    ModelConfigurationError,
+    OpenRouterError,
+    chat,
+    model_name,
+    provider_name,
+)
 from engine import (
     FINAL_REVELATIONS,
     FRAGMENT_LABELS,
@@ -35,7 +42,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-MODEL_NAME = "gemma4:e4b"
 CANON_PATH = Path(__file__).resolve().parent / "story" / "canon.json"
 CANON = json.loads(CANON_PATH.read_text(encoding="utf-8"))
 
@@ -66,13 +72,7 @@ _Did he invite you into the house… or did the house invite you in?_
 
 
 def generate_response(game):
-    result = ollama.chat(
-        model=MODEL_NAME,
-        messages=build_messages(game, CANON),
-        think=False,
-        options=generation_options(game),
-    )
-    return tidy(result.message.content)
+    return tidy(chat(build_messages(game, CANON), generation_options(game)))
 
 
 def show_image(path, **kwargs):
@@ -536,8 +536,8 @@ with conversation_column:
                 st.markdown("---")
                 st.markdown("**THE END**")
 
-            if "ollama_error" in st.session_state:
-                st.error(st.session_state.ollama_error)
+            if "model_error" in st.session_state:
+                st.error(st.session_state.model_error)
 
     action = st.chat_input(
         "Describe what you do...",
@@ -554,13 +554,13 @@ if action:
     try:
         with thinking_placeholder.container():
             with st.spinner("Thinking..."):
-                maybe_summarize(game, MODEL_NAME)
+                maybe_summarize(game)
                 response = generate_response(game)
     except ollama.ResponseError as error:
         if error.status_code == 404:
             error_message = (
-                f"Ollama could not find {MODEL_NAME}. "
-                f"Run `ollama pull {MODEL_NAME}` and try again."
+                f"Ollama could not find {model_name()}. "
+                f"Run `ollama pull {model_name()}` and try again."
             )
         else:
             error_message = f"Ollama returned an error: {error.error}"
@@ -569,17 +569,28 @@ if action:
             "Could not connect to Ollama. Make sure Ollama is running, "
             f"then try again. Details: {error}"
         )
+    except ModelConfigurationError as error:
+        error_message = str(error)
+    except OpenRouterError as error:
+        if error.status_code is None:
+            error_message = str(error)
+        else:
+            error_message = (
+                f"OpenRouter returned an error (HTTP {error.status_code}): {error}"
+            )
     else:
         if not response:
-            error_message = "Ollama returned an empty response. Please try again."
+            error_message = (
+                f"{provider_name().title()} returned an empty response. Please try again."
+            )
 
     if error_message:
         st.session_state.game = snapshot    # undo the failed turn completely
-        st.session_state.ollama_error = error_message
+        st.session_state.model_error = error_message
     else:
-        st.session_state.pop("ollama_error", None)
+        st.session_state.pop("model_error", None)
         game["history"].append({"role": "assistant", "content": response})
 
     st.rerun()
 
-st.caption(f"Powered by Ollama · {MODEL_NAME}")
+st.caption(f"Powered by {provider_name().title()} · {model_name()}")
