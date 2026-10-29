@@ -4,17 +4,16 @@
 
 ## The House That Remembers
 
-This is my submission for Hacktoberfest Open-Source AI Challenge: Week 4. This Week's Theme: Ghost in the Machine - 
-Build something spooky, or something that honors the past in the spirit of Día de los Muertos, with open-weight models or open-source AI.
+This is my submission for the Hacktoberfest Open-Source AI Challenge: Week 4. This week's theme is "Ghost in the Machine": build something spooky, or something that honors the past in the spirit of Día de los Muertos, using open-weight models or open-source AI.
 
-Because I love the spooky season, DnD (and reading crazy thrillers 😅), I decided to built a short DnD-style game. I call it _The House That Remembers_, inspired by The Fall of the House of Usher written by Edgar Allan Poe in 1839. There are very big spoilers in the /story folder. If you want to enjoy the game, I recommend not checking the story files. 
+Because I love the spooky season, D&D, and reading crazy thrillers 😅, I decided to build a short D&D-style game. I call it _The House That Remembers_, and it's inspired by Edgar Allan Poe's 1839 story _The Fall of the House of Usher_. The `story` folder contains major spoilers, so if you want to enjoy the game, I recommend avoiding those files.
 
 Tech stack:
-- Streamlit - app.py: UI, chat interface
-- Python - for logic, validates actions, updated history, clues, inventory
-- Ollama + Gemma - narrates the permitted outcome
+- Streamlit (`app.py`) - UI and chat interface
+- Python - game logic, action validation, and history, clue, and inventory tracking
+- Ollama + Gemma - narrate the permitted outcome
 
-Trigger warnings: it is a horror story! There is no gore, but there are mentions of death and similar themes. 
+Trigger warning: This is a horror story. It contains no gore, but it does mention death and related themes.
 
 ### Premise
 _The letter arrived three nights ago, its paper creased and stained, the handwriting unmistakably your friend's — though the words were unlike anything you had ever known him to write._
@@ -37,7 +36,7 @@ _Did he invite you into the house… or did the house invite you in?_
 
 ### Tips for interacting with the story
 
-Describe your actions, lot of things are allowed! Think about your goal and what you are hoping to achieve. There is no right or wrong way to play this game. This games is based on TTRPG-style of games, where you are role-playing a character. The model serves as "DM" (Dungeon Master) - the narrator. He is the storyteller, the referee, maintains the setting in which the game is happening, and plays roles of "NPCs" (non-player characters). 
+Describe your actions—lots of things are possible! Think about your goal and what you hope to achieve. There is no right or wrong way to play this game. It's based on TTRPG-style games, where you role-play a character. The model serves as the DM (Dungeon Master), or narrator. It tells the story, acts as the referee, maintains the setting, and plays the NPCs (non-player characters).
 
 The narrator distinguishes spoken dialogue, physical actions, exploration, and
 questions about the player's memories. You can make the intent clear in natural
@@ -62,7 +61,7 @@ By default, the app uses Ollama locally. Install Ollama and download the model:
 ollama pull gemma4:e4b
 ```
 
-Make sure the Ollama service is running. Then, from the repository root, install the project dependencies: (optional: create and activate a virtual environment)
+Make sure the Ollama service is running. Then, from the repository root, install the project dependencies. You can optionally create and activate a virtual environment first:
 
 ```powershell
 py -m venv .venv
@@ -76,10 +75,10 @@ Start the app with:
 python -m streamlit run .\the-house-that-remembers\app.py
 ```
 
-Streamlit prints a local URL in the terminal; open it in your browser to view the app. After the initial download, it can run on your machine offline. 
+Streamlit prints a local URL in the terminal; open it in your browser to view the app. After the initial download, it can run on your machine offline.
 
 ### Play online
 
 Deployed on Render: [https://the-house-that-remembers.onrender.com/](https://the-house-that-remembers.onrender.com/)
 
-I am using the provided free credits and will keep it running until the end of Hacktoberfest (or until I run out). The LLM response are little slow - the first load might be especially slow, and the the following responses rake around ~24 seconds. Render doesn't provide GPU Compute in this version, so the model runs on CPUs. 
+I'm using the provided free credits and will keep it running until the end of Hacktoberfest (or until I run out). LLM responses are a little slow: the first load might be especially slow, and subsequent responses take around 24 seconds. Render doesn't provide GPU compute on this plan, so the model runs on CPUs.
