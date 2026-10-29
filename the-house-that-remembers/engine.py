@@ -448,8 +448,27 @@ SPEECH_RE = re.compile(
 DOOR_TRY_RE = re.compile(r"\b(open|unlock|force|push|break|kick|try|turn|enter)\b.*\bdoor\b")
 DOOR_LOOK_RE = re.compile(r"\b(listen|knock|examine|inspect|look|read|study)\b")
  
-CONFRONT_RE = re.compile(r"\b(dead|died|dies|death|corpses?|bodies|body)\b")
+CONFRONT_RE = re.compile(r"\b(dead|die|died|dies|death|corpses?|bodies|body)\b")
 FAMILY_RE = re.compile(r"\b(mother|mom|mum|father|dad|sister|parents|family)\b")
+FAMILY_BODIES_RE = re.compile(r"\b(their|they)\s+bodies?\b")
+FAMILY_KILLING_RE = re.compile(r"\b(kills?|killed|killing|murders?|murdered|murdering)\b")
+GHOST_RE = re.compile(r"\bghosts?\b")
+SISTER_PRONOUN_RE = re.compile(r"\b(she|her)\b")
+DISMISSIVE_RE = re.compile(
+    r"\b(?:"
+    r"stop being (?:so )?(?:dramatic|ridiculous)|"
+    r"don'?t be (?:so )?(?:dramatic|ridiculous)|"
+    r"you(?:'re| are) (?:being )?(?:dramatic|ridiculous)|"
+    r"get over it|"
+    r"it(?:'s| is) not a big deal|"
+    r"nothing is wrong|"
+    r"you(?:'re| are) (?:fine|imagining things)|"
+    r"you(?:'re| are) making this up|"
+    r"stop whining|quit whining|"
+    r"pull yourself together|"
+    r"that(?:'s| is) nonsense"
+    r")\b"
+)
 SUPPORT_RE = re.compile(
     r"\b(comfort|reassure|hug|not your fault|i'?m here|i am here|here for you|not alone|safe)\b"
     r"|\bit'?s (ok|okay|alright)\b"
@@ -767,7 +786,22 @@ def _resolve(game, text):
  
     # --- blunt confrontation about the family ---------------------------------
     # Confronting him is also said aloud, so quoted speech counts here too.
-    if (not game["truth_known"] and CONFRONT_RE.search(spoken) and FAMILY_RE.search(spoken)):
+    refers_to_family = FAMILY_RE.search(spoken) or FAMILY_BODIES_RE.search(spoken)
+    accuses_family_of_death = CONFRONT_RE.search(spoken) and refers_to_family
+    accuses_family_of_killing = FAMILY_KILLING_RE.search(spoken) and FAMILY_RE.search(spoken)
+    calls_sister_a_ghost = GHOST_RE.search(spoken) and (
+        FAMILY_RE.search(spoken) or SISTER_PRONOUN_RE.search(spoken)
+    )
+    is_dismissive = DISMISSIVE_RE.search(spoken)
+    if (
+        not game["truth_known"]
+        and (
+            accuses_family_of_death
+            or accuses_family_of_killing
+            or calls_sister_a_ghost
+            or is_dismissive
+        )
+    ):
         return _confront(game)
 
     # --- movement -----------------------------------------------------------
