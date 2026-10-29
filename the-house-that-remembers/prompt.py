@@ -114,6 +114,23 @@ ENDINGS = {
     ),
 }
 
+SISTER_BARGAIN_QUESTION = (
+    '"Please, leave this house and everything behind. Do you accept my bargain?"'
+)
+SISTER_BARGAIN_DEPARTURE = (
+    "As the question hangs in the still air, she dissolves into the grey light."
+)
+
+
+def append_sister_bargain_question(response, game):
+    result = game.get("last_result") or {}
+    if result.get("sister_departed") and game.get("sister_bargain_offered"):
+        return (
+            f"{response}\n\n{SISTER_BARGAIN_QUESTION}"
+            f"\n\n{SISTER_BARGAIN_DEPARTURE}"
+        )
+    return response
+
 
 def denial_band(denial):
     if denial >= 7:
@@ -218,6 +235,8 @@ def state_block(game):
         f"Shared family memories: {', '.join(game.get('final_revelations', [])) or 'none'}",
         f"Sister's private conversation available: {'yes' if game.get('sister_bargain_available') else 'no'}",
         f"Sister's preservation belief heard: {'yes' if game.get('sister_bargain_heard') else 'no'}",
+        f"Sister has asked the player to accept the bargain: {'yes' if game.get('sister_bargain_offered') else 'no'}",
+        f"Player's sister-bargain choice: {game.get('sister_bargain_choice') or 'undecided'}",
         f"Sister physically present: {'yes' if game.get('sister_present') else 'no'}",
         f"Sister conversation turns: {game.get('sister_conversation_turns', 0)}/5",
         f"Exits: {', '.join(exit_labels(game, game['room']))}",
@@ -286,10 +305,20 @@ def _engine_note(game):
             "not the friend. The friend is elsewhere and must not answer or arrive."
         )
     if r.get("sister_departed"):
-        note += (
-            "\nAfter this reply, the sister vanishes. Her bargain remains an available "
-            "choice if she has explained her perspective; the player may also move or leave normally."
-        )
+        if game.get("sister_bargain_offered"):
+            note += (
+                "\nThis is the sister's final turn. She is making her final offer. "
+                "Keep her present and waiting; do not "
+                "narrate her vanishing or add or paraphrase the question. The game "
+                "will add her exact question, then narrate her disappearance. Do not "
+                "decide for the player."
+            )
+        else:
+            note += (
+                "\nAfter this reply, the sister vanishes. "
+                "The player may move or leave normally; do not imply they must accept "
+                "anything to leave."
+            )
     if r.get("sister_perspective"):
         note += (
             "\nThe sister's perspective to explain clearly if the player asked: "

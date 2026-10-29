@@ -3,6 +3,7 @@
 Nothing in here calls the model. The model only ever sees the *result* of
 what this module decides (see prompt.py).
 """
+import ast
 import re
 from pprint import pprint
 
@@ -23,8 +24,8 @@ SUPPORT_LIMIT = 3          # times kindness can lower his denial
 MAX_TURNS = 90             # unresolved truth or denial by then -> "denial" ending
 NUDGE_AFTER_TURNS = 4
 NUDGE_COOLDOWN = 3
-SISTER_COOLDOWN = 12
-SISTER_CONVERSATION_LIMIT = 5
+SISTER_COOLDOWN = 8
+SISTER_CONVERSATION_LIMIT = 3
 
 FINAL_REVELATIONS = (
     {
@@ -340,10 +341,12 @@ def new_game():
         "last_notice_turn": -99, # turn_count when a detail was last surfaced
         "last_nudge_turn": -99,  # turn_count when the friend was last nudged
         "nudges_here": 0,          # nudges in this room since last move (escalate)
-        "last_sister_turn": -99,
+        "last_sister_turn": 0,
         "sister_warning_count": 0,
         "sister_bargain_available": False,
         "sister_bargain_heard": False,
+        "sister_bargain_offered": False,
+        "sister_bargain_choice": None,
         "sister_present": False,
         "sister_conversation_turns": 0,
         "denial": 8,             # friend's denial (high = deflecting)
@@ -359,6 +362,58 @@ def new_game():
         "summary": "",           # rolling summary of folded-away history
         "summary_idx": 0,        # history[:summary_idx] is already summarized
     }
+
+
+def parse_game_state_dump(text):
+    """Parse and validate a game-state dictionary printed by the engine."""
+    state_start = text.find("{")
+    if state_start == -1:
+        raise ValueError("No game-state dictionary was found in the pasted text.")
+
+    try:
+        state = ast.literal_eval(text[state_start:].strip())
+    except (SyntaxError, ValueError) as error:
+        raise ValueError("Could not parse the pasted game-state dictionary.") from error
+
+    if not isinstance(state, dict):
+        raise ValueError("The pasted game state must be a dictionary.")
+
+    missing_keys = set(new_game()) - state.keys()
+    if missing_keys:
+        raise ValueError(
+            "The pasted state is missing required fields: "
+            + ", ".join(sorted(missing_keys))
+        )
+    if (
+        not isinstance(state["room"], str)
+        or state["room"] not in ROOMS
+        or not isinstance(state["friend_room"], str)
+        or state["friend_room"] not in ROOMS
+    ):
+        raise ValueError("The player or friend location is not a valid room.")
+    if state["ending"] not in (
+        None,
+        "leave_together",
+        "escape_alone",
+        "denial",
+        "sisters_bargain",
+    ):
+        raise ValueError("The pasted state contains an unknown ending.")
+    for key in ("inventory", "clues", "visited", "final_revelations", "history"):
+        if not isinstance(state[key], list):
+            raise ValueError(f"The {key} field must be a list.")
+    if not isinstance(state["examined"], dict):
+        raise ValueError("The examined field must be a dictionary.")
+    for message in state["history"]:
+        if (
+            not isinstance(message, dict)
+            or message.get("role") not in {"assistant", "user"}
+            or not isinstance(message.get("content"), str)
+        ):
+            raise ValueError("Each history entry must have a valid role and text.")
+
+    return state
+
 
 def fragment_progress(game):
     """Return clue counts and completion status for each memory fragment."""
@@ -413,11 +468,14 @@ TOGETHER_RE = re.compile(
     r"|\blet'?s (leave|get out)\b"
 )
 SISTER_ACCEPT_RE = re.compile(
-    r"\b(?:i accept|i agree to (?:your|the) (?:offer|bargain)|"
+    r"\b(?:yes|yeah|yep|sure|okay|ok|alright|i agree|i accept|"
+    r"i choose to leave the house to preserve the family|"
+    r"i agree to (?:your|the) (?:offer|bargain)|"
     r"i choose (?:to accept|your offer|the offer|your bargain|the bargain)|"
     r"i'll do it|i will do it|i want them to stay|"
     r"i want to keep them as they are|i want to preserve them)\b"
 )
+SISTER_STAY_RE = re.compile(r"^\s*i choose to stay in the house[.!]?\s*$")
 SISTER_PERSPECTIVE_RE = re.compile(
     r"\b(why|what|how|who|where|when|do you|are you|can you|could you|"
     r"tell me|explain|your (side|belief|perspective))\b|\?"
@@ -603,6 +661,39 @@ def _path_step(game, start, goal_fn):
     return (hit[0][0], hit[1]) if hit else None
 
 
+def _move_to(game, target, heading_out=False):
+    route = _path_to(game, game["room"], lambda room: room == target)
+    if not route:
+        return _result(
+            "blocked",
+            f"The {target} cannot be reached from the {game['room']}. "
+            f"Reachable from here: {', '.join(exit_labels(game, game['room']))}.",
+        )
+
+    path, _ = route
+    first_time_rooms = []
+    for step in path:
+        if step not in game["visited"]:
+            game["visited"].append(step)
+            first_time_rooms.append(step)
+        if step == "Parents' Bedroom":
+            game["truth_known"] = True
+    game["room"] = target
+    game["room_turns"] = 0
+    game["nudges_here"] = 0
+    if heading_out:
+        detail = "The player reached the Entrance Hall but has not left the house yet."
+    else:
+        detail = f"The player moved to the {target}."
+    if len(path) > 1:
+        detail += f" They passed through {', '.join(path[:-1])} on the way."
+    if first_time_rooms:
+        detail += f" First visit to: {', '.join(first_time_rooms)}."
+    if game["friend_room"] != target:
+        detail += f" The friend remains in the {game['friend_room']}."
+    return _result("moved", detail)
+
+
 def _nudge(game):
     """Hint for steering a lingering player onward. None if there is nowhere to send them."""
     room_name = game["room"]
@@ -734,17 +825,27 @@ def _resolve(game, text):
     spoken_negated = bool(NEGATION_RE.search(spoken))
 
     if (
-        game.get("sister_bargain_available")
-        and game["friend_room"] != game["room"]
+        game["friend_room"] != game["room"]
+        and game.get("sister_bargain_offered")
+        and game.get("sister_bargain_heard")
+        and game.get("sister_bargain_choice") is None
+        and SISTER_STAY_RE.search(spoken)
+    ):
+        game["sister_bargain_choice"] = "stayed"
+        return _result(
+            "no_change",
+            "The player chooses to stay in the house for now, declining the sister's "
+            "bargain. The story continues; the player has not left.",
+        )
+
+    if (
+        game["friend_room"] != game["room"]
+        and game.get("sister_bargain_offered")
+        and game.get("sister_bargain_choice") is None
         and not spoken_negated
         and SISTER_ACCEPT_RE.search(spoken)
     ):
-        if not game.get("sister_bargain_heard"):
-            return _result(
-                "blocked",
-                "The sister has not explained her bargain yet. The player cannot "
-                "accept it before hearing what she believes.",
-            )
+        game["sister_bargain_choice"] = "accepted"
         return _end(
             game,
             "sisters_bargain",
@@ -777,7 +878,7 @@ def _resolve(game, text):
     if LEAVE_RE.search(text) and not negated:
         if room_name == "Entrance Hall":
             return _end(game, "escape_alone", "The player walks out of the house alone.")
-        return _result("blocked", "The way out of the house is back through the Entrance Hall.")
+        return _move_to(game, "Entrance Hall", heading_out=True)
     
     # --- the bedroom door -----------------------------------------------------
     if room_name == "Upper Landing" and not negated:
@@ -816,34 +917,7 @@ def _resolve(game, text):
             elif re.search(r"\b(down|downstairs)\b", text) and (room_name, "down") in VERTICAL:
                 target = VERTICAL[(room_name, "down")]
         if target:
-            route = _path_to(game, room_name, lambda r: r == target)
-            if route:
-                path, _ = route
-                first_time_rooms = []
-                for step in path:
-                    if step not in game["visited"]:
-                        game["visited"].append(step)
-                        first_time_rooms.append(step)
-                    if step == "Parents' Bedroom":
-                        game["truth_known"] = True
-                game["room"] = target
-                game["room_turns"] = 0
-                game["nudges_here"] = 0
-                detail = f"The player moved to the {target}."
-                if len(path) > 1:
-                    detail += f" They passed through {', '.join(path[:-1])} on the way."
-                if first_time_rooms:
-                    detail += (
-                        f" First visit to: {', '.join(first_time_rooms)}."
-                    )
-                if game["friend_room"] != target:
-                    detail += f" The friend remains in the {game['friend_room']}."
-                return _result("moved", detail)
-            return _result(
-                "blocked",
-                f"The {target} cannot be reached from the {room_name}. "
-                f"Reachable from here: {', '.join(exit_labels(game, room_name))}.",
-            )
+            return _move_to(game, target)
         if room_name in rooms_named:
             return _result("no_change", f"The player is already in the {room_name}.")
 
@@ -936,32 +1010,36 @@ def apply_action(game, raw_action):
     """Resolve one player action, update game state, return the engine result."""
     game.setdefault("friend_room", "Entrance Hall")
     game.setdefault("sister_seen", False)
-    game.setdefault("last_sister_turn", -99)
+    game.setdefault("last_sister_turn", 0)
+    if not game["sister_seen"] and game["last_sister_turn"] == -99:
+        game["last_sister_turn"] = 0
     game.setdefault("sister_warning_count", 0)
     game.setdefault("sister_bargain_available", False)
     game.setdefault("sister_bargain_heard", False)
+    game.setdefault("sister_bargain_offered", False)
+    game.setdefault("sister_bargain_choice", None)
     game.setdefault("sister_present", False)
     game.setdefault("sister_conversation_turns", 0)
     game.setdefault("final_revelations", [])
     text = raw_action.lower()
     intent = _classify_intent(raw_action, game)   # classify before the action can change the room
     sister_appearance_due = (
-        not game["sister_seen"]
-        or game["turn_count"] + 1 - game["last_sister_turn"] >= SISTER_COOLDOWN
+        game["turn_count"] + 1 - game["last_sister_turn"] >= SISTER_COOLDOWN
     )
     private_sister_due = (
-        game["stage"] >= 3
-        and sister_appearance_due
+        sister_appearance_due
         and not game["ending"]
         and game["sister_warning_count"] >= 2
         and not game["sister_bargain_heard"]
         and game["friend_room"] != game["room"]
     )
     speaking_with_sister = (
-        (game["sister_present"] or private_sister_due)
-        and intent in {"dialogue", "action_and_dialogue"}
+        game["sister_present"]
         and not game["ending"]
         and game["friend_room"] != game["room"]
+    ) or (
+        private_sister_due
+        and intent in {"dialogue", "action_and_dialogue"}
     )
     seen_before = len(game["examined"])           # measured BEFORE resolving, so first looks count as fresh
     result = _resolve(game, text)
@@ -1067,11 +1145,8 @@ def apply_action(game, raw_action):
         result["family_memory"] = revelation
 
     result["stage_advanced"] = _advance_stage(game)
-    sister_due = (
-        not game["sister_seen"]
-        or game["turn_count"] - game["last_sister_turn"] >= SISTER_COOLDOWN
-    )
-    if game["stage"] >= 3 and sister_due and not game["ending"]:
+    sister_due = game["turn_count"] - game["last_sister_turn"] >= SISTER_COOLDOWN
+    if sister_due and not game["ending"]:
         can_speak_privately = (
             game["sister_warning_count"] >= 2
             and not game["sister_bargain_heard"]
@@ -1102,7 +1177,11 @@ def apply_action(game, raw_action):
         result["sister"] = appearance
         result["sister_private_encounter"] = can_speak_privately
 
-    if speaking_with_sister and result["outcome"] not in {"ending", "blocked"}:
+    if (
+        speaking_with_sister
+        and intent not in {"movement", "physical_action", "examination", "exploration"}
+        and result["outcome"] not in {"ending", "blocked", "moved"}
+    ):
         result["sister_conversation"] = True
         if SISTER_PERSPECTIVE_RE.search(raw_action.lower()):
             game["sister_bargain_heard"] = True
@@ -1111,6 +1190,7 @@ def apply_action(game, raw_action):
         if game["sister_conversation_turns"] >= SISTER_CONVERSATION_LIMIT:
             game["sister_present"] = False
             result["sister_departed"] = True
+            game["sister_bargain_offered"] = True
 
     game["last_result"] = result
     print("Game state:")

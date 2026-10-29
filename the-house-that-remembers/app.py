@@ -19,8 +19,15 @@ from engine import (
     fragment_progress,
     fragments_complete,
     new_game,
+    parse_game_state_dump,
 )
-from prompt import build_messages, generation_options, maybe_summarize, tidy
+from prompt import (
+    append_sister_bargain_question,
+    build_messages,
+    generation_options,
+    maybe_summarize,
+    tidy,
+)
 
 st.set_page_config(page_title="The House That Remembers", layout="wide")
 st.markdown(
@@ -84,7 +91,7 @@ def generate_response(game):
 
 def generate_turn_response(game):
     maybe_summarize(game, MODEL_NAME)
-    return generate_response(game)
+    return append_sister_bargain_question(generate_response(game), game)
 
 
 def show_image(path, **kwargs):
@@ -476,6 +483,22 @@ with st.sidebar:
         st.session_state.pop("ollama_error", None)
         st.rerun()
 
+    with st.expander("Load game state (testing)"):
+        state_dump = st.text_area(
+            "Paste the complete Game state output",
+            height=220,
+            key="game_state_dump",
+            help="Paste the dictionary printed in the terminal after 'Game state:'.",
+        )
+        if st.button("Load pasted state", use_container_width=True):
+            try:
+                st.session_state.game = parse_game_state_dump(state_dump)
+            except ValueError as error:
+                st.error(str(error))
+            else:
+                st.session_state.pop("ollama_error", None)
+                st.rerun()
+
     st.subheader("Atmosphere")
     sound_enabled = st.checkbox("Background rain", value=True)
     if sound_enabled:
@@ -551,12 +574,35 @@ with conversation_column:
             if "ollama_error" in st.session_state:
                 st.error(st.session_state.ollama_error)
 
+    action = None
+    if (
+        game.get("sister_bargain_offered")
+        and game.get("sister_bargain_choice") is None
+        and game.get("friend_room") != game["room"]
+        and not game["ending"]
+    ):
+        bargain_column, stay_column = st.columns(2)
+        if bargain_column.button(
+            "Leave the house to preserve the family",
+            use_container_width=True,
+            key="accept_sister_bargain",
+        ):
+            action = "I choose to leave the house to preserve the family."
+        if stay_column.button(
+            "Stay",
+            use_container_width=True,
+            key="decline_sister_bargain",
+        ):
+            action = "I choose to stay in the house."
+
     thinking_placeholder = st.empty()
     slow_response_placeholder = st.empty()
-    action = st.chat_input(
+    chat_action = st.chat_input(
         "Describe what you do...",
         disabled=bool(game["ending"]),
     )
+    if chat_action:
+        action = chat_action
 
 if action:
     snapshot = copy.deepcopy(game)          # restore this if the model call fails
