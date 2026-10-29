@@ -76,5 +76,10 @@ Start the app with:
 python -m streamlit run .\the-house-that-remembers\app.py
 ```
 
-Streamlit prints a local URL in the terminal; open it in your browser to view the app.
+Streamlit prints a local URL in the terminal; open it in your browser to view the app. After the initial download, it can run on your machine offline. 
 
+### Play online
+
+Deployed on Render: [https://the-house-that-remembers.onrender.com/](https://the-house-that-remembers.onrender.com/)
+
+I am using the provided free credits and will keep it running until the end of Hacktoberfest (or until I run out). The LLM response are little slow - the first load might be especially slow, and the the following responses rake around ~24 seconds. Render doesn't provide GPU Compute in this version, so the model runs on CPUs. 

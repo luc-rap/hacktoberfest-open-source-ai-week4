@@ -1,6 +1,7 @@
 import base64
 import copy
 import json
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from io import BytesIO
 from pathlib import Path
 
@@ -73,6 +74,11 @@ def generate_response(game):
         options=generation_options(game),
     )
     return tidy(result.message.content)
+
+
+def generate_turn_response(game):
+    maybe_summarize(game, MODEL_NAME)
+    return generate_response(game)
 
 
 def show_image(path, **kwargs):
@@ -521,7 +527,6 @@ with scene_column:
         )
 
 with conversation_column:
-    thinking_placeholder = st.empty()
     st.markdown("### What will you do?")
     with st.container(key="conversation_frame"):
         with st.container(height=480, border=True, autoscroll=True):
@@ -539,6 +544,8 @@ with conversation_column:
             if "ollama_error" in st.session_state:
                 st.error(st.session_state.ollama_error)
 
+    thinking_placeholder = st.empty()
+    slow_response_placeholder = st.empty()
     action = st.chat_input(
         "Describe what you do...",
         disabled=bool(game["ending"]),
@@ -554,8 +561,16 @@ if action:
     try:
         with thinking_placeholder.container():
             with st.spinner("Thinking..."):
-                maybe_summarize(game, MODEL_NAME)
-                response = generate_response(game)
+                with ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(generate_turn_response, game)
+                    try:
+                        response = future.result(timeout=30)
+                    except FutureTimeoutError:
+                        slow_response_placeholder.info(
+                            "Still working—this response is taking longer than usual, "
+                            "but the game is still processing."
+                        )
+                        response = future.result()
     except ollama.ResponseError as error:
         if error.status_code == 404:
             error_message = (
@@ -572,6 +587,8 @@ if action:
     else:
         if not response:
             error_message = "Ollama returned an empty response. Please try again."
+    finally:
+        slow_response_placeholder.empty()
 
     if error_message:
         st.session_state.game = snapshot    # undo the failed turn completely
