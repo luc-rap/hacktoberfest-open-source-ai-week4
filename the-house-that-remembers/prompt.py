@@ -10,7 +10,7 @@ Layers (top to bottom):
 """
 import re
 
-from llm import chat
+import ollama
 
 CORE = """You are the narrator of a gothic-horror interactive story, "The House That Remembers".
 
@@ -385,7 +385,7 @@ SUMMARY_TRIGGER = 20   # live messages before we fold
 KEEP_RECENT = 10       # messages kept verbatim after folding
 
 
-def maybe_summarize(game):
+def maybe_summarize(game, model):
     live = game["history"][game["summary_idx"]:]
     if len(live) <= SUMMARY_TRIGGER:
         return
@@ -400,11 +400,13 @@ def maybe_summarize(game):
         f"Previous summary: {game['summary'] or '(none)'}\n\n"
         f"New events:\n{transcript}"
     )
-    summary = chat(
-        [{"role": "user", "content": prompt}],
-        {"temperature": 0.2, "num_predict": 200, "num_ctx": 8192},
+    r = ollama.chat(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        think=False,
+        options={"temperature": 0.2, "num_predict": 200, "num_ctx": 8192},
     )
-    summary = summary.strip()
+    summary = r.message.content.strip()
     if summary:
         game["summary"] = summary
         game["summary_idx"] += len(fold)

@@ -78,10 +78,3 @@ python -m streamlit run .\the-house-that-remembers\app.py
 
 Streamlit prints a local URL in the terminal; open it in your browser to view the app.
 
-### Deployed with Render and OpenRouter
-
-This is an option when running locally is not available. The model used is the free Gemma 4 26B A4B from OpenRouter. The provider may retain prompts, but does not use them for training. 
-
-The included Dockerfile is configured for OpenRouter and runs the Streamlit app
-as a Render web service. In Render, set these environment variables:
-
