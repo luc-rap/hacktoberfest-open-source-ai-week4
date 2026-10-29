@@ -37,6 +37,12 @@ st.markdown(
 )
 
 MODEL_NAME = "gemma4:e4b"
+ENDING_LABELS = {
+    "leave_together": "Ending 1 of 4 — Leave Together",
+    "escape_alone": "Ending 2 of 4 — Escape Alone",
+    "denial": "Ending 3 of 4 — Denial",
+    "sisters_bargain": "Ending 4 of 4 — The Sister's Bargain",
+}
 CANON_PATH = Path(__file__).resolve().parent / "story" / "canon.json"
 CANON = json.loads(CANON_PATH.read_text(encoding="utf-8"))
 
@@ -540,6 +546,7 @@ with conversation_column:
             if game["ending"]:
                 st.markdown("---")
                 st.markdown("**THE END**")
+                st.caption(ENDING_LABELS[game["ending"]])
 
             if "ollama_error" in st.session_state:
                 st.error(st.session_state.ollama_error)
