@@ -18,9 +18,13 @@ Trigger warning: This is a horror story. It contains no gore, but it does mentio
 ### Premise
 _The letter arrived three nights ago, its paper creased and stained, the handwriting unmistakably your friend's — though the words were unlike anything you had ever known him to write._
 
-_"Please, you must come. There are things in this house I can no longer explain. I fear it is too late for me. You are the only one I can trust."_
+_"Please, you must come. There are things in this house I can no longer explain. I'm afraid it may be too late for me. You're the only person I can trust."_
 
-_Now, you stand before his ancestral home. Rain lashes against your face, and thunder rolls across the darkened sky. The house looms above you, its crooked silhouette barely visible through the mist. Tall, narrow windows stare down like hollow eyes. Ivy claws at the weathered stone walls, and the iron gates behind you groan in the wind, slowly swinging shut. Something about the place feels wrong. The air is unnaturally cold, carrying the scent of wet earth and rotting leaves. Though no lights burn inside, you cannot shake the feeling that someone is watching you from the upper windows._
+_Now, you stand before his home. Rain lashes against your face, and thunder rolls across the darkened sky. The house looms above you, its crooked silhouette barely visible through the mist. Tall, narrow windows stare down like hollow eyes. Ivy claws at the weathered stone walls, and the iron gates behind you groan in the wind, slowly swinging shut._
+
+_You remember this house from your childhood, but something about it feels wrong. You used to play outside, spend time helping your friend with chores in the kitchen, explore the family library, and even sleep over in the guest room._
+
+_The air is unnaturally cold, carrying the scent of wet earth and rotting leaves. Though no lights burn inside, you cannot shake the feeling that someone is watching you from the upper windows._
 
 _For a moment, lightning illuminates the facade — and you could swear a shadow has just moved behind the glass._
 
