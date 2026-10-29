@@ -1,0 +1,323 @@
+Game state:
+{'room': 'Upper Landing',
+ 'friend_room': 'Kitchen',
+ 'inventory': ['The Letter', 'Upper Landing Note'],
+ 'clues': ['A musty smell lingers in the air',
+           'A third cup sits set out at the table, as if someone else were '
+           'expected',
+           'A kitchen chair is pulled out, as though someone had just stood up',
+           'A plate of food sits on the counter, untouched',
+           'The calendar on the wall is turned to March, but it is currently '
+           'October. Year is faded and unreadable',
+           "A note on the parents' bedroom door reads: do not open; do not "
+           'change; I have to keep things as they are',
+           'Slow knocking comes from inside the locked bedroom'],
+ 'visited': ['Entrance Hall', 'Kitchen', 'Grand Staircase', 'Upper Landing'],
+ 'examined': {'Entrance Hall:smell': 1,
+              'Kitchen:cups': 2,
+              'Kitchen:chair': 1,
+              'Kitchen:food': 1,
+              'Kitchen:calendar': 2,
+              'Upper Landing:door': 2},
+ 'stage': 4,
+ 'turns_in_stage': 2,
+ 'turn_count': 33,
+ 'room_turns': 6,
+ 'last_notice_turn': 31,
+ 'last_nudge_turn': 22,
+ 'nudges_here': 0,
+ 'last_sister_turn': 32,
+ 'sister_warning_count': 2,
+ 'sister_bargain_available': True,
+ 'sister_bargain_heard': True,
+ 'sister_bargain_offered': False,
+ 'sister_bargain_choice': None,
+ 'sister_present': True,
+ 'sister_conversation_turns': 2,
+ 'denial': 0,
+ 'pushed': 0,
+ 'support_given': 1,
+ 'door_open': False,
+ 'truth_known': False,
+ 'final_revelations': [],
+ 'sister_seen': True,
+ 'ending': None,
+ 'last_result': {'nudge': None,
+                 'outcome': 'no_change',
+                 'detail': 'Nothing the engine tracks changed. Treat the '
+                           'action as ordinary roleplay (talking, resting, '
+                           'small gestures). Do not add items, clues, or '
+                           'events. No room change happens: the player is '
+                           'still in the Upper Landing, and nobody leads them '
+                           'elsewhere unless they choose an exit (Grand '
+                           "Staircase, Parents' Bedroom (door locked)).",
+                 'new_clue': None,
+                 'ambient': None,
+                 'friend': None,
+                 'intent': 'dialogue',
+                 'stage_advanced': False,
+                 'sister_conversation': True,
+                 'sister_perspective': 'She believes the family is still '
+                                       'together as long as the house '
+                                       'preserves them exactly as they were. '
+                                       'To her, keeping things unchanged is a '
+                                       'way of keeping them alive; she warns '
+                                       'the player away because she fears that '
+                                       'facing the truth will make her lose '
+                                       'them.'},
+ 'history': [{'role': 'assistant',
+              'content': '"You came. I didn\'t think you would... Thank you."\n'
+                         '\n'},
+             {'role': 'user', 'content': '"Of course"'},
+             {'role': 'assistant',
+              'content': 'He shifts slightly, rubbing at his temples with a '
+                         'pale hand. "It\'s... good to see you here." He '
+                         'pauses, looking around the cavernous hall as if '
+                         'expecting something unseen. "What about your family? '
+                         'How are things on your end?"'},
+             {'role': 'user', 'content': '"Good"'},
+             {'role': 'assistant',
+              'content': 'He nods slowly, a flicker of something weary '
+                         'crossing his face. "That\'s... good to hear." He '
+                         'glances toward the shadows near the staircase. "I '
+                         "haven't been sleeping much lately. The house is loud "
+                         'at night sometimes."'},
+             {'role': 'user', 'content': '"Sorry to hear that"'},
+             {'role': 'assistant',
+              'content': 'A musty smell lingers in the air, a mixture of old '
+                         "wood and dust. He manages a weak smile that doesn't "
+                         'reach his eyes. "It is what it is, I suppose." He '
+                         'gestures vaguely toward the far side of the hall. '
+                         '"Do you want some tea? The kitchen\'s just this way, '
+                         'if you\'d like."'},
+             {'role': 'user', 'content': '"Yes"'},
+             {'role': 'assistant',
+              'content': 'He lets out a small sigh, seeming relieved by the '
+                         'acceptance. "It\'s just... quiet when you\'re not '
+                         'around." He hesitates before nodding toward the '
+                         'archway leading deeper into the house. "The kitchen '
+                         'is through there."'},
+             {'role': 'user', 'content': 'Go to the kitchen'},
+             {'role': 'assistant',
+              'content': 'The narrow kitchen smells strongly of old spices and '
+                         'damp stone. Rain ticks steadily against a dark '
+                         'window above the sink. Your friend is still standing '
+                         'near the entrance hall archway, waiting. He watches '
+                         'you enter without moving toward you.'},
+             {'role': 'user', 'content': 'examine kitchen'},
+             {'role': 'assistant',
+              'content': 'The narrow kitchen smells strongly of old spices and '
+                         'damp stone. Two cups sit waiting by the teapot on '
+                         'the counter. Further down, at the edge of the small '
+                         'table, a third cup sits set out and untouched. The '
+                         'rain continues its steady rhythm against the '
+                         'windowpane.'},
+             {'role': 'user', 'content': 'examine third cup'},
+             {'role': 'assistant',
+              'content': 'The third cup remains perfectly still on the worn '
+                         'wood of the table. It sits exactly where someone '
+                         "would set it down for a visitor who hasn't arrived "
+                         'yet. The porcelain shows faint, undisturbed rings '
+                         'from past warmth. You notice no dust settled upon '
+                         'its rim.'},
+             {'role': 'user', 'content': 'wait for friend'},
+             {'role': 'assistant',
+              'content': 'As you wait, a faint figure resolves into your '
+                         "friend's sister near the kitchen doorway. She "
+                         'speaks, "You shouldn\'t be here. Please. It\'s safer '
+                         'if you go," before dissolving back into the shadows. '
+                         'Your friend remains by the entrance hall archway, '
+                         'still waiting for you.'},
+             {'role': 'user', 'content': 'follow her'},
+             {'role': 'assistant',
+              'content': 'You move toward where she stood, but your steps feel '
+                         'heavy on the worn floorboards. The faint scent of '
+                         'lavender lingers near the doorway you approached. '
+                         'One chair at the table is pulled out slightly, as '
+                         'though someone had only just stood up from it. Your '
+                         'friend still stands watching from the hall '
+                         'entrance.'},
+             {'role': 'user', 'content': '"Your sister"'},
+             {'role': 'assistant',
+              'content': 'Your friend steps into the kitchen from the hall, '
+                         'looking suddenly pale beneath the dim light. "What '
+                         'about her?" he asks quietly, studying your face with '
+                         'a worried frown. He seems genuinely unsettled by '
+                         'anything that lingers in this place.'},
+             {'role': 'user', 'content': '"She said I should leave"'},
+             {'role': 'assistant',
+              'content': 'Your friend shifts his weight, running a hand over '
+                         'his tired face. "She... she always worries," he '
+                         'murmurs, avoiding your gaze for a moment. He glances '
+                         'toward the doorway where you saw her, then quickly '
+                         'back to the counter. "It\'s just this house; it gets '
+                         'strange."'},
+             {'role': 'user', 'content': '"Where did she go?"'},
+             {'role': 'assistant',
+              'content': 'He shrugs faintly, looking vaguely toward the '
+                         'shadowed doorway. "I don\'t know where she went," he '
+                         'admits, his voice low and hesitant. The faint but '
+                         'familiar smell of food from the plate on the counter '
+                         'seems to thicken the quiet air around you both. He '
+                         'trails off, seeming unsure how to answer further.'},
+             {'role': 'user', 'content': '"I will look for her"'},
+             {'role': 'assistant',
+              'content': 'He watches you intently as you speak, a flicker of '
+                         'apprehension crossing his features. "Don\'t," he '
+                         'cautions softly, taking an involuntary step toward '
+                         'you. He hesitates, then lowers his voice even '
+                         'further. "Maybe... maybe we should just stay here '
+                         'for a bit."'},
+             {'role': 'user',
+              'content': '"Okay... sorry. yes I came here for you"'},
+             {'role': 'assistant',
+              'content': 'He lets out a long, shaky breath, and the tension '
+                         'around his shoulders seems to ease slightly. "You '
+                         'didn\'t have to," he murmurs, finally meeting your '
+                         'eyes with a look of genuine relief. He nods slowly, '
+                         'as if accepting this fragile truce between you both. '
+                         'The ticking rain continues its monotonous beat '
+                         'against the window glass.'},
+             {'role': 'user', 'content': '"Your letter worried me"'},
+             {'role': 'assistant',
+              'content': 'He nods slowly, a fragile peace settling between '
+                         'you. "I... I didn\'t want to scare you," he admits, '
+                         'looking down at his hands. You notice the calendar '
+                         'on the wall is turned to March, yet it is clearly '
+                         'October, and the year has faded into illegibility. '
+                         'He seems preoccupied by the strange discrepancy.'},
+             {'role': 'user', 'content': 'examine calendar'},
+             {'role': 'assistant',
+              'content': 'As you look closer at the calendar, the month March '
+                         'is clearly displayed, but the year has faded beyond '
+                         'recognition. Just as you take it in, his sister '
+                         'appears again near the archway and whispers, '
+                         '"Leave," before vanishing instantly. Your friend '
+                         'flinches slightly at her sudden appearance.'},
+             {'role': 'user',
+              'content': '"Why is your calendar set to March?"'},
+             {'role': 'assistant',
+              'content': 'He glances toward the calendar, then quickly averts '
+                         'his gaze back to the counter. "I... I don\'t know," '
+                         'he replies vaguely, fiddling with the edge of the '
+                         'wooden table. He seems genuinely unsure of how to '
+                         "answer such a specific question about the house's "
+                         'state. "It’s just... always been this way here."'},
+             {'role': 'user',
+              'content': '"Okay... So, what\'s troubling you?"'},
+             {'role': 'assistant',
+              'content': 'He shifts uncomfortably on the worn chair, running a '
+                         'hand over his tired face. "It\'s... everything," he '
+                         'murmurs, avoiding your gaze again. He pauses, then '
+                         'adds quietly, "I just haven\'t been sleeping much '
+                         'lately." The scent of damp stone and old spices '
+                         'seems heavier in the small room now.'},
+             {'role': 'user', 'content': '"Did something happen?"'},
+             {'role': 'assistant',
+              'content': 'He looks up at you then, a deep weariness settling '
+                         'over his features. "I don\'t know if anything '
+                         '*happened*," he admits quietly. He gestures vaguely '
+                         'toward the doorway leading out of the kitchen. '
+                         '"Maybe... maybe we should just go to the Entrance '
+                         'Hall for a while?"'},
+             {'role': 'user', 'content': '"Sure?"'},
+             {'role': 'assistant',
+              'content': 'He lets out a small, fragile sigh that seems too '
+                         'heavy for his frame. "It\'s just... this house," he '
+                         'says, shaking his head slightly. He manages a weak, '
+                         'almost painful smile. "I suppose we can stay here '
+                         'for now."'},
+             {'role': 'user', 'content': '"Whatever floats your boat"'},
+             {'role': 'assistant',
+              'content': 'He watches you for a moment, the exhaustion around '
+                         'his eyes deepening. "It\'s just... I don\'t know '
+                         'what to expect," he murmurs, looking toward the dark '
+                         'window again. He pulls his shoulders in slightly, as '
+                         'if bracing against an unseen draft.'},
+             {'role': 'user', 'content': '"What do you mean?"'},
+             {'role': 'assistant',
+              'content': 'He looks down at the untouched plate on the counter, '
+                         'tracing a line through the grime with his finger. '
+                         '"It\'s just... things feel wrong," he says quietly. '
+                         'From the direction of the Entrance Hall, a faint '
+                         'shift in the light seems to reach into the kitchen '
+                         "space. He doesn't look toward it, remaining focused "
+                         'on the damp stone floor between you.'},
+             {'role': 'user', 'content': 'Go look at the entrance hall'},
+             {'role': 'user', 'content': 'go to the kitchen'},
+             {'role': 'assistant',
+              'content': 'You remain in the Kitchen as you move through it '
+                         'again. A faint shape flickers near the archway '
+                         'leading to the Entrance Hall; his sister is there '
+                         'for a moment before vanishing. She whispers softly, '
+                         '"Leave." Your friend doesn\'t react to her presence, '
+                         'still standing by the counter.'},
+             {'role': 'user', 'content': 'go to the entrance hall'},
+             {'role': 'assistant',
+              'content': 'You step out of the kitchen and into the cavernous '
+                         'Entrance Hall. The heavy silence rushes back in to '
+                         'meet you there. Your friend remains behind you, '
+                         'still standing within the shadows of the kitchen '
+                         "doorway. He doesn't call out from the other side."},
+             {'role': 'user', 'content': 'go upstairs'},
+             {'role': 'assistant',
+              'content': 'The staircase groans beneath your weight as you '
+                         'begin to ascend toward the landing. Dust motes dance '
+                         'in the weak light filtering down from the upper '
+                         'floor. From above comes the faint sound of someone '
+                         'humming, a threadbare melody drifting down the dark '
+                         'wood. Your friend remains downstairs in the '
+                         'kitchen.'},
+             {'role': 'user', 'content': 'go to the upper landing'},
+             {'role': 'assistant',
+              'content': 'You reach the Upper Landing; the air here feels '
+                         'colder than downstairs. A single grey window casts a '
+                         'weak wash of light across the narrow space. Every '
+                         'door lining this corridor remains firmly shut. Your '
+                         'friend is still in the kitchen below.'},
+             {'role': 'user', 'content': 'examine'},
+             {'role': 'assistant',
+              'content': 'You walk slowly down the length of the landing, your '
+                         'hand brushing against the cold wood of the '
+                         'doorframes. The silence here is thick, pressing down '
+                         'on you. You notice the folded note taped to one of '
+                         'the doors at the far end.'},
+             {'role': 'user', 'content': 'take note'},
+             {'role': 'assistant',
+              'content': 'The paper feels stiff and brittle beneath your '
+                         'fingers. You unfold the note, its contents still '
+                         'obscured by shadow. Downstairs, you hear nothing '
+                         'from your friend; the house seems to hold its breath '
+                         'around you.'},
+             {'role': 'user', 'content': 'read the note'},
+             {'role': 'assistant',
+              'content': "You read the careful script taped to the parents' "
+                         "bedroom door. The note reads: 'Do not open, Do not "
+                         "change, I have to keep things as they are.' A musty "
+                         'scent seems stronger near this particular closed '
+                         'door. Downstairs, your friend remains silent in the '
+                         'kitchen.'},
+             {'role': 'user', 'content': 'knock on the door'},
+             {'role': 'assistant',
+              'content': 'You press your ear against the cold wood of the '
+                         'locked door. From inside, you hear a slow '
+                         'knock—three measured beats. Then the quiet returns, '
+                         'heavy and absolute. This faint sound seems to linger '
+                         'in the stale air of the landing. Your friend is '
+                         'still unaware of this exchange downstairs.'},
+             {'role': 'user', 'content': '"Hello? Is anybody in there?"'},
+             {'role': 'assistant',
+              'content': 'The air near the door shifts, and your sister '
+                         'materializes before you. She looks past the locked '
+                         'wood, her expression one of profound, weary '
+                         'conviction. "It must be preserved," she says softly. '
+                         '"If we let it change, if we look too closely at what '
+                         'was... then they won\'t stay with us."'},
+             {'role': 'user', 'content': '"Who are you talking about?"'}],
+ 'summary': 'The player went back through the kitchen and into the Entrance '
+            'Hall. There, they found their sister flickering near the archway, '
+            'who whispered, "Leave." The player asked what troubled him, and '
+            'he admitted that everything was troubling him, stating things '
+            'felt wrong in the house. He suggested going to the Entrance Hall '
+            'for a while before ultimately agreeing to stay put.',
+ 'summary_idx': 49}
